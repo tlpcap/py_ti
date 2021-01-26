@@ -21,5 +21,3 @@ numpy 1.19.2
 pandas 1.2.1
 
 numba 0.51.2
-
-# Example Usage:
