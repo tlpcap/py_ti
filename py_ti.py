@@ -358,8 +358,9 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
     fast = 2 / (n_fast + 1)
     slow = 2 / (n_slow + 1)
     sc = (er * (fast - slow) + slow) ** 2
+    length = len(df)
 
-    kama = __kama_loop(df[column].to_numpy(), len(df), n_er, sc)
+    kama = __kama_loop(df[column].values, length=length, n_er=n_er, sc=sc)
 
     if add_col == True:
         df[f'kama{n_er,n_fast,n_slow}'] = kama
