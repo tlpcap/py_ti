@@ -2,7 +2,9 @@
 A non-exhaustive collection of technical indicators.
 
 # Current List:<br />
-Simple Returns<br />Log Returns<br />
+Simple Returns<br />
+Log Returns<br />
+Simple Moving Average<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the index as the date.<br />
