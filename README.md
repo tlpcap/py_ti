@@ -5,6 +5,11 @@ A non-exhaustive collection of technical indicators.
 Simple Returns<br />
 Log Returns<br />
 Simple Moving Average<br />
+Exponential Moving Average<br />
+Weighted Moving Average<br />
+Hull Moving Average<br />
+Wilders Moving Average<br />
+Kaufmans Adaptive Moving Average<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the index as the date.<br />
