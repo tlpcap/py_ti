@@ -1,4 +1,4 @@
-# tlp_ti
+# py_ti
 A non-exhaustive collection of technical indicators.
 
 # Current List:<br />
