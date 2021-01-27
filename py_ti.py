@@ -131,7 +131,7 @@ def ema(df, column='close', n=20, add_col=False, return_struct='numpy'):
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
-    first_value = df[column][:n].rolling(window=n).mean()
+    first_value = df[column].iloc[:n].rolling(window=n).mean()
     _ema = pd.concat([first_value, df[column][n:]])
     ema = _ema.ewm(span=n, adjust=False).mean()
 
