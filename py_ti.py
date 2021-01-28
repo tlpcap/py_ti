@@ -576,7 +576,7 @@ def atr_percent(df, column='close', n=20, ma_method='sma',
         be floats.  volume should be an int.  The date index should be
         a Datetime.
     column : String, optional. The default is 'close'.
-        This is the name of the column you to use as the denominator
+        This is the name of the column you want to use as the denominator
         of the percentage calculatioin.
     n : Int, optional. The default is 20.
         The lookback period.
