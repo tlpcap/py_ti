@@ -28,13 +28,14 @@ def returns(df, column='close', ret_method='simple',
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+    
     check_errors(df=df, column=column, ret_method=ret_method,
                  add_col=add_col, return_struct=return_struct)
 
@@ -76,13 +77,14 @@ def sma(df, column='close', n=20, add_col=False, return_struct='numpy'):
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+    
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
@@ -121,13 +123,14 @@ def ema(df, column='close', n=20, add_col=False, return_struct='numpy'):
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+    
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
@@ -168,13 +171,14 @@ def wma(df, column='close', n=20, add_col=False, return_struct='numpy'):
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+    
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
@@ -215,13 +219,14 @@ def hma(df, column='close', n=20, add_col=False, return_struct='numpy'):
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+    
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
@@ -241,17 +246,18 @@ def hma(df, column='close', n=20, add_col=False, return_struct='numpy'):
 
 @jit
 def __wilders_loop(data, n):
-"""
-Wilders Moving Average Helper Loop.
-Jit from Numba used to improve performance of loop
-"""
+    """
+    Wilder's Moving Average Helper Loop
+    Jit used to improve performance
+    """
+
     for i in range(n, len(data)):
         data[i] = (data[i-1] * (n-1) + data[i]) / n
     return data
 
 
 def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
-    """ Wilders Moving Average
+    """ Wilder's Moving Average
     Parameters
     ----------
     df : Pandas DataFrame
@@ -274,13 +280,14 @@ def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+
     check_errors(df=df, column=column, n=n,
                  add_col=add_col, return_struct=return_struct)
 
@@ -300,11 +307,12 @@ def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
 
 
 @jit
-def __kama_loop(data, length, n_er, sc):
-"""
-Kaufman's Adaptive Moving Average Helper Loop
-Jit from Numba used to improve performance of loop
-"""
+def __kama_loop(data, sc, n_er, length):
+    """
+    Kaufman's Adaptive Moving Average Helper Loop
+    Jit used to improve performance
+    """
+
     kama = np.full(length, np.nan)
     kama[n_er-1] = data[n_er-1]
 
@@ -315,7 +323,7 @@ Jit from Numba used to improve performance of loop
 
 def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
          add_col=False, return_struct='numpy'):
-    """ Kaufmans Adaptive Moving Average
+    """ Kaufman's Adaptive Moving Average
     Parameters
     ----------
     df : Pandas DataFrame
@@ -342,13 +350,14 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
     Returns
     -------
     There are 3 ways to return values from this function:
-    1. add_col=False, return_struct='numpy' returns numpy array (default)
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
     3. add_col=True, adds a column to the dataframe that was passed in.
     
-    Note that if add_col=True the function exits and does not execute the
+    Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+
     check_errors(df=df, column=column, n_er=n_er, n_fast=n_fast, n_slow=n_slow,
                  add_col=add_col, return_struct=return_struct)
 
@@ -357,10 +366,10 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
     er = change / vol
     fast = 2 / (n_fast + 1)
     slow = 2 / (n_slow + 1)
-    sc = (er * (fast - slow) + slow) ** 2
+    sc = ((er * (fast - slow) + slow) ** 2).to_numpy()
     length = len(df)
 
-    kama = __kama_loop(df[column].values, length=length, n_er=n_er, sc=sc)
+    kama = __kama_loop(df[column].to_numpy(), sc, n_er, length)
 
     if add_col == True:
         df[f'kama{n_er,n_fast,n_slow}'] = kama
@@ -371,3 +380,96 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
                             index=df.index)
     else:
         return kama
+
+
+def momentum(df, column='close', n=20, add_col=False, return_struct='numpy'):
+    """ Momentum
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date.  open/high/low/close should all
+        be floats.  volume should be an int.  The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'.
+        This is the name of the column you want to operate on.
+    n : Int, optional. The default is 20.
+        The lookback period.
+    add_col : Boolean, optional. The default is False.
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'.
+        Only two values accepted: 'numpy' and 'pandas'.  If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in.
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, column=column, n=n,
+                 add_col=add_col, return_struct=return_struct)
+
+    mom = df[column].diff(n)
+
+    if add_col == True:
+        df[f'mom({n})'] = mom
+        return df
+    elif return_struct == 'pandas':
+        return mom.to_frame(name=f'mom({n})')
+    else:
+        return mom.to_numpy()
+
+
+def rate_of_change(df, column='close', n=20,
+                   add_col=False, return_struct='numpy'):
+    """ Rate of Change
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date.  open/high/low/close should all
+        be floats.  volume should be an int.  The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'.
+        This is the name of the column you want to operate on.
+    n : Int, optional. The default is 20.
+        The lookback period.
+    add_col : Boolean, optional. The default is False.
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'.
+        Only two values accepted: 'numpy' and 'pandas'.  If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in.
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, column=column, n=n,
+                 add_col=add_col, return_struct=return_struct)
+
+    roc = df[column].diff(n) / df[column].shift(n) * 100
+
+    if add_col == True:
+        df[f'roc({n})'] = roc
+        return df
+    elif return_struct == 'pandas':
+        return roc.to_frame(name=f'roc({n})')
+    else:
+        return roc.to_numpy()
