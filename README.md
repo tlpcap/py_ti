@@ -10,6 +10,8 @@ Weighted Moving Average<br />
 Hull Moving Average<br />
 Wilders Moving Average<br />
 Kaufmans Adaptive Moving Average<br />
+Momentum<br />
+Rate of Change<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the index as the date.<br />
