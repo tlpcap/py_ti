@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
-from numba import jit
 from check_errors import check_errors
+import utils
 
 def returns(df, column='close', ret_method='simple',
             add_col=False, return_struct='numpy'):            
@@ -244,18 +244,6 @@ def hma(df, column='close', n=20, add_col=False, return_struct='numpy'):
         return hma
 
 
-@jit
-def __wilders_loop(data, n):
-    """
-    Wilder's Moving Average Helper Loop
-    Jit used to improve performance
-    """
-
-    for i in range(n, len(data)):
-        data[i] = (data[i-1] * (n-1) + data[i]) / n
-    return data
-
-
 def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
     """ Wilder's Moving Average
     Parameters
@@ -293,7 +281,7 @@ def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
 
     first_value = df[column].iloc[:n].rolling(window=n).mean().fillna(0)
     _arr = (pd.concat([first_value, df[column].iloc[n:]])).to_numpy()
-    wilders = __wilders_loop(_arr, n=n)
+    wilders = utils.wilders_loop(_arr, n=n)
 
     if add_col == True:
         df[f'wilders({n})'] = wilders
@@ -304,21 +292,6 @@ def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
                             index=df.index)
     else:
         return wilders
-
-
-@jit
-def __kama_loop(data, sc, n_er, length):
-    """
-    Kaufman's Adaptive Moving Average Helper Loop
-    Jit used to improve performance
-    """
-
-    kama = np.full(length, np.nan)
-    kama[n_er-1] = data[n_er-1]
-
-    for i in range(n_er, length):
-        kama[i] = kama[i-1] + sc[i] * (data[i] - kama[i-1])
-    return kama
 
 
 def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
@@ -369,7 +342,7 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
     sc = ((er * (fast - slow) + slow) ** 2).to_numpy()
     length = len(df)
 
-    kama = __kama_loop(df[column].to_numpy(), sc, n_er, length)
+    kama = utils.kama_loop(df[column].to_numpy(), sc, n_er, length)
 
     if add_col == True:
         df[f'kama{n_er,n_fast,n_slow}'] = kama
