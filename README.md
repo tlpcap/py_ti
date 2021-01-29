@@ -15,6 +15,7 @@ Rate of Change<br />
 True Range<br />
 Average True Range<br />
 Average True Range Percent<br />
+Keltner Channels<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the index as the date.<br />
