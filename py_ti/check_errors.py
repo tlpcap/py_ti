@@ -1,9 +1,3 @@
-"""
-Created on Tue Jan 26 15:00:56 2021
-@author: Castaldy
-Error checking for technical indicators
-"""
-
 from pandas import DataFrame
 
 RET_METHODS = {'simple', 'log'}
