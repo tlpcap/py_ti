@@ -4,6 +4,7 @@ A non-exhaustive collection of technical indicators.
 # Current List:<br />
 Simple Returns<br />
 Log Returns<br />
+Historical Volatility<br />
 Simple Moving Average<br />
 Exponential Moving Average<br />
 Weighted Moving Average<br />
