@@ -1,13 +1,19 @@
+"""
+Created on Tue Jan 26 15:00:56 2021
+@author: Castaldy
+Error checking for technical indicators
+"""
+
 from pandas import DataFrame
 
-COLUMNS = {'open', 'high', 'low', 'close', 'volume'}
 RET_METHODS = {'simple', 'log'}
 MA_METHODS = {'sma', 'ema', 'wma', 'hma', 'wilders', 'kama'}
 RETURN_STRUCTS = {'numpy', 'pandas'}
 DDOF = {0, 1}
 
 DF_ERR_MESSAGE = "Error: 'df' must be a Pandas DataFrame"
-COLUMN_ERR_MESSAGE = f"Invalid column. Valid columns: {COLUMNS}"
+COLUMN_ERR_MESSAGE = "Error: 'column' must be of type str"
+COLUMN_ERR_MESSAGE_2 = "Invalid Column: column name not found in dataframe"
 RET_ERR_MESSAGE = f"Invalid method. Valid methods: {RET_METHODS}"
 N_ERR_MESSAGE = "Error: 'n' must be of type int"
 N_ER_ERR_MESSAGE = "Error: 'n_er' must be of type int"
@@ -51,8 +57,11 @@ def check_errors(df=None,
     if df is not None and type(df) is not DataFrame:
         raise Exception(DF_ERR_MESSAGE)
 
-    if column is not None and column not in COLUMNS:
+    if column is not None and type(column) is not str:
         raise Exception(COLUMN_ERR_MESSAGE)
+
+    if column is not None and column not in df.columns:
+        raise Exception(COLUMN_ERR_MESSAGE_2)
 
     if ret_method is not None and ret_method not in RET_METHODS:
         raise Exception(RET_ERR_MESSAGE)
@@ -107,4 +116,3 @@ def check_errors(df=None,
 
     if return_struct is not None and return_struct not in RETURN_STRUCTS:
         raise Exception(RETURN_STRUCTS_ERR_MESSAGE)
-        
