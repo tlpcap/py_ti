@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from check_errors import check_errors
-import helper_loops
+from helper_loops import wilders_loop, kama_loop
 
 
 def sma(df, column='close', n=20, add_col=False, return_struct='numpy'):
@@ -232,7 +232,7 @@ def wilders_ma(df, column='close', n=20, add_col=False, return_struct='numpy'):
 
     first_value = df[column].iloc[:n].rolling(window=n).mean().fillna(0)
     _arr = (pd.concat([first_value, df[column].iloc[n:]])).to_numpy()
-    wilders = helper_loops.wilders_loop(_arr, n)
+    wilders = wilders_loop(_arr, n)
 
     if add_col == True:
         df[f'wilders({n})'] = wilders
@@ -289,7 +289,7 @@ def kama(df, column='close', n_er=10, n_fast=2, n_slow=30,
     sc = ((er * (fast - slow) + slow) ** 2).to_numpy()
     length = len(df)
 
-    kama = helper_loops.kama_loop(df[column].to_numpy(), sc, n_er, length)
+    kama = kama_loop(df[column].to_numpy(), sc, n_er, length)
 
     if add_col == True:
         df[f'kama{n_er,n_fast,n_slow}'] = kama
