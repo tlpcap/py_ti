@@ -3,6 +3,7 @@ import pandas as pd
 
 import utils
 from check_errors import check_errors
+from moving_averages import sma, ema, wma, hma, wilders_ma, kama
 
 def returns(df, column='close', ret_method='simple',
             add_col=False, return_struct='numpy'):            
@@ -13,7 +14,7 @@ def returns(df, column='close', ret_method='simple',
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        be floats. volume should be an int. The date index should be
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
@@ -64,7 +65,7 @@ def hvol(df, column='close', n=20, ret_method='simple', ddof=1,
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        be floats. volume should be an int. The date index should be
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
@@ -121,7 +122,7 @@ def momentum(df, column='close', n=20, add_col=False, return_struct='numpy'):
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int. The date index should be
+        be floats. volume should be an int. The date index should be
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
@@ -169,7 +170,7 @@ def rate_of_change(df, column='close', n=20,
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        be floats. volume should be an int.  The date index should be
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
@@ -216,7 +217,7 @@ def true_range(df, add_col=False, return_struct='numpy'):
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int. The date index should be
+        be floats. volume should be an int. The date index should be
         a Datetime.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
@@ -320,7 +321,7 @@ def atr_percent(df, column='close', n=20, ma_method='sma',
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to use as the denominator
-        of the percentage calculatioin.
+        of the percentage calculation.
     n : Int, optional. The default is 20
         The lookback period.
     ma_method : String, optional.  The default is 'sma'
@@ -370,11 +371,10 @@ def keltner_channel(df, column='close', n=20, ma_method='sma',
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
         with the index being a date. open/high/low/close should all
-        be floats.  volume should be an int. The date index should be
+        be floats. volume should be an int. The date index should be
         a Datetime.
     column : String, optional. The default is 'close'
-        This is the name of the column you want to use as the denominator
-        of the percentage calculatioin.
+        This is the name of the column you want to operate on.
     n : Int, optional. The default is 20
         The lookback period.
     ma_method : String, optional. The default is 'sma'
@@ -426,3 +426,71 @@ def keltner_channel(df, column='close', n=20, ma_method='sma',
                             index=df.index)
     else:
         return keltner
+
+
+def bollinger_bands(df, column='close', n=20, ma_method='sma', ddof=1,
+                    upper_num_sd=2.0, lower_num_sd=2.0,
+                    add_col=False, return_struct='numpy'):
+    """ Bollinger Bands
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the name of the column you want to operate on.
+    n : Int, optional. The default is 20
+        The lookback period.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the column to obtain the middle band.
+        Available smoothing methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
+    upper_num_sd : Float, optional. The default is 2.0
+        The amount by which to the standard deviation is multiplied and then
+        added to the middle band to create the upper band.
+    lower_num_sd : Float, optional. The default is 2.0
+        The amount by which to the standard deviation is multiplied and then
+        subtracted from the middle band to create the lower band.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+ 
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                  upper_num_sd=upper_num_sd, lower_num_sd=lower_num_sd,
+                  add_col=add_col, return_struct=return_struct)
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    price_std = (df[column].rolling(window=n).std(ddof=ddof)).to_numpy()
+    mid_bb = _ma_func(df, column=column, n=n)
+    lower_bb = mid_bb - (price_std * lower_num_sd)
+    upper_bb = mid_bb + (price_std * upper_num_sd)
+    bollinger = np.vstack((lower_bb, upper_bb)).transpose()
+
+    if add_col == True:
+        df[f'bb({n})_lower'] = lower_bb
+        df[f'bb({n})_upper'] = upper_bb
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(bollinger,
+                            columns=[f'bb({n})_lower', f'bb({n})_upper'],
+                            index=df.index)
+    else:
+        return bollinger
