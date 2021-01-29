@@ -20,7 +20,7 @@ Keltner Channels<br />
 Bollinger Bands<br />
 
 # Data
-Data should be in open/high/low/close/volume format in a Pandas DataFrame with the index as the date.<br />
+Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
 ohlc = float<br />
 volume = int<br />
 date = Datetime<br />
