@@ -1,30 +1,16 @@
-import numpy as np
-from numba import jit
+import moving_averages as ma
 
-
-@jit
-def wilders_loop(data, n):
+def moving_average_mapper(moving_average):
     """
-    Wilder's Moving Average Helper Loop
-    Jit used to improve performance
+    Map input strings to functions
     """
+    moving_average_funcs = {'sma': ma.sma,
+                            'ema': ma.ema,
+                            'wma': ma.wma,
+                            'hma': ma.hma,
+                            'wilders': ma.wilders_ma,
+                            'kama': ma.kama}
 
-    for i in range(n, len(data)):
-        data[i] = (data[i-1] * (n-1) + data[i]) / n
-    return data
+    moving_average = moving_average_funcs[moving_average]
 
-
-@jit
-def kama_loop(data, sc, n_er, length):
-    """
-    Kaufman's Adaptive Moving Average Helper Loop
-    Jit used to improve performance
-    """
-
-    kama = np.full(length, np.nan)
-    kama[n_er-1] = data[n_er-1]
-
-    for i in range(n_er, length):
-        kama[i] = kama[i-1] + sc[i] * (data[i] - kama[i-1])
-    return kama
-    
+    return moving_average
