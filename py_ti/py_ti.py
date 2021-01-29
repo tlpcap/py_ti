@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
-from check_errors import check_errors
+
 import utils
+from check_errors import check_errors
 
 def returns(df, column='close', ret_method='simple',
             add_col=False, return_struct='numpy'):            
@@ -11,19 +12,19 @@ def returns(df, column='close', ret_method='simple',
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
+        with the index being a date. open/high/low/close should all
         be floats.  volume should be an int.  The date index should be
         a Datetime.
-    column : String, optional. The default is 'close'.
+    column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
-    ret_method : String, optional. The default is 'simple'.
+    ret_method : String, optional. The default is 'simple'
         The kind of returns you want returned: 'simple' or 'log'
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to
         True, the function will add a column to the dataframe that was
         passed in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -31,7 +32,7 @@ def returns(df, column='close', ret_method='simple',
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -53,26 +54,35 @@ def returns(df, column='close', ret_method='simple',
     else:
         return returns.to_numpy()
 
-def momentum(df, column='close', n=20, add_col=False, return_struct='numpy'):
-    """ Momentum
+
+def hvol(df, column='close', n=20, ret_method='simple', ddof=1,
+         add_col=False, return_struct='numpy'):
+    """ Calculate Annualized Historical Volatility
     
     Parameters
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
+        with the index being a date. open/high/low/close should all
         be floats.  volume should be an int.  The date index should be
         a Datetime.
-    column : String, optional. The default is 'close'.
+    column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
-    n : Int, optional. The default is 20.
-        The lookback period.
-    add_col : Boolean, optional. The default is False.
-        By default the function will return a numpy array. If set to True,
-        the function will add a column to the dataframe that was passed
-        in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    n : Int, optional. The default is 20
+        This is the lookback period for which you want to calculate
+        historical volatility.
+    ddof : Int, optional. The default is 1
+        The degrees of freedom to feed into the standard deviation
+        function of pandas: 1 is for sample standard deviation and
+        0 is for population standard deviation.
+    ret_method : String, optional. The default is 'simple'
+        The kind of returns you want returned: 'simple' or 'log'
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to
+        True, the function will add a column to the dataframe that was
+        passed in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -80,7 +90,57 @@ def momentum(df, column='close', n=20, add_col=False, return_struct='numpy'):
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, column=column, n=n, ret_method=ret_method, ddof=ddof,
+                  add_col=add_col, return_struct=return_struct)
+
+    rets = returns(df, column=column, ret_method=ret_method)
+    _df = pd.DataFrame(rets, columns=[column])
+    hvol = _df.rolling(window=n).std(ddof=ddof) * 252 ** 0.5
+    hvol.columns = [f'hvol({n})']
+
+    if add_col == True:
+        df[f'hvol({n})'] = hvol.to_numpy()
+        return df
+    elif return_struct == 'pandas':
+        return hvol
+    else:
+        return hvol.to_numpy()
+
+
+def momentum(df, column='close', n=20, add_col=False, return_struct='numpy'):
+    """ Momentum
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats.  volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the name of the column you want to operate on.
+    n : Int, optional. The default is 20
+        The lookback period.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -108,19 +168,19 @@ def rate_of_change(df, column='close', n=20,
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
+        with the index being a date. open/high/low/close should all
         be floats.  volume should be an int.  The date index should be
         a Datetime.
-    column : String, optional. The default is 'close'.
+    column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
-    n : Int, optional. The default is 20.
+    n : Int, optional. The default is 20
         The lookback period.
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
         in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -128,7 +188,7 @@ def rate_of_change(df, column='close', n=20,
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -155,15 +215,15 @@ def true_range(df, add_col=False, return_struct='numpy'):
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        with the index being a date. open/high/low/close should all
+        be floats.  volume should be an int. The date index should be
         a Datetime.
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
         in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -171,7 +231,7 @@ def true_range(df, add_col=False, return_struct='numpy'):
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -200,20 +260,20 @@ def atr(df, n=20, ma_method='sma', add_col=False, return_struct='numpy'):
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
         a Datetime.
-    n : Int, optional. The default is 20.
+    n : Int, optional. The default is 20
         The lookback period.
-    ma_method : String, optional.  The default is 'sma'
+    ma_method : String, optional. The default is 'sma'
         The method of smoothing the True Range.  Available smoothing
         methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
         in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -221,7 +281,7 @@ def atr(df, n=20, ma_method='sma', add_col=False, return_struct='numpy'):
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -255,23 +315,23 @@ def atr_percent(df, column='close', n=20, ma_method='sma',
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
         a Datetime.
-    column : String, optional. The default is 'close'.
+    column : String, optional. The default is 'close'
         This is the name of the column you want to use as the denominator
         of the percentage calculatioin.
-    n : Int, optional. The default is 20.
+    n : Int, optional. The default is 20
         The lookback period.
     ma_method : String, optional.  The default is 'sma'
-        The method of smoothing the True Range.  Available smoothing
+        The method of smoothing the True Range. Available smoothing
         methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
         in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -279,7 +339,7 @@ def atr_percent(df, column='close', n=20, ma_method='sma',
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
@@ -309,27 +369,27 @@ def keltner_channel(df, column='close', n=20, ma_method='sma',
     ----------
     df : Pandas DataFrame
         A Dataframe containing the columns open/high/low/close/volume
-        with the index being a date.  open/high/low/close should all
-        be floats.  volume should be an int.  The date index should be
+        with the index being a date. open/high/low/close should all
+        be floats.  volume should be an int. The date index should be
         a Datetime.
-    column : String, optional. The default is 'close'.
+    column : String, optional. The default is 'close'
         This is the name of the column you want to use as the denominator
         of the percentage calculatioin.
-    n : Int, optional. The default is 20.
+    n : Int, optional. The default is 20
         The lookback period.
-    ma_method : String, optional.  The default is 'sma'
-        The method of smoothing the True Range.  Available smoothing
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the True Range. Available smoothing
         methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
-    upper_factor : Float, optional.  The default is 2.0
+    upper_factor : Float, optional. The default is 2.0
         The amount by which to multiply the ATR to create the upper channel.
-    lower_factor : Float, optional.  The default is 2.0
+    lower_factor : Float, optional. The default is 2.0
         The amount by which to multiply the ATR to create the lower channel.
-    add_col : Boolean, optional. The default is False.
+    add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
         in to it instead or returning a numpy array.
-    return_struct : String, optional. The default is 'numpy'.
-        Only two values accepted: 'numpy' and 'pandas'.  If set to
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
         'pandas', a new dataframe will be returned.
 
     Returns
@@ -337,7 +397,7 @@ def keltner_channel(df, column='close', n=20, ma_method='sma',
     There are 3 ways to return values from this function:
     1. add_col=False, return_struct='numpy' returns a numpy array (default)
     2. add_col=False, return_struct='pandas' returns a new dataframe
-    3. add_col=True, adds a column to the dataframe that was passed in.
+    3. add_col=True, adds a column to the dataframe that was passed in
     
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
