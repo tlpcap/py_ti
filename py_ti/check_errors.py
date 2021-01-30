@@ -15,6 +15,7 @@ N_FAST_ERR_MESSAGE = "Error: 'n_fast' must be of type int"
 N_SLOW_ERR_MESSAGE = "Error: 'n_slow' must be of type int"
 FAST_ERR_MESSAGE = "Error: 'fast' must be of type int"
 SLOW_ERR_MESSAGE = "Error: 'slow' must be of type int"
+SIG_ERR_MESSAGE = "Error: 'sig' must be of type int"
 MA_ERR_MESSAGE = f"Invalid method. Valid methods: {MA_METHODS}"
 FACTOR_ERR_MESSAGE = "Error: 'factor' must be of type float"
 UPPER_FACTOR_ERR_MESSAGE = "Error: 'upper_factor' must be of type float"
@@ -36,6 +37,7 @@ def check_errors(df=None,
                  n_slow=None,
                  fast=None,
                  slow=None,
+                 sig=None,
                  ma_method=None,
                  factor=None,
                  upper_factor=None,
@@ -77,6 +79,9 @@ def check_errors(df=None,
 
     if slow is not None and type(slow) is not int:
         raise Exception(SLOW_ERR_MESSAGE)
+
+    if sig is not None and type(sig) is not int:
+        raise Exception(SIG_ERR_MESSAGE)
 
     if ma_method is not None and ma_method not in MA_METHODS:
         raise Exception(MA_ERR_MESSAGE)
