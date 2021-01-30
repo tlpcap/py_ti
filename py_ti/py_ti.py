@@ -494,3 +494,66 @@ def bollinger_bands(df, column='close', n=20, ma_method='sma', ddof=1,
                             index=df.index)
     else:
         return bollinger
+
+
+def rsi(df, column='close', n=20, ma_method='sma',
+        add_col=False, return_struct='numpy'):
+""" Relative Strength Index
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the name of the column you want to operate on.
+    n : Int, optional. The default is 20
+        The lookback period.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the average up and average down variables.
+        Available smoothing methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+ 
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                  add_col=add_col, return_struct=return_struct)
+
+    change = pd.DataFrame(df[column].diff()).fillna(0)
+    up, dn = change.copy(), change.copy()
+    up[up < 0] = 0
+    dn[dn > 0] = 0
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    avg_up = _ma_func(up, column=column, n=n)
+    avg_dn = -_ma_func(dn, column=column, n=n)
+
+    rsi = np.where(avg_dn == 0.0, 100, 100.0 - 100.0 / (1 + avg_up / avg_dn))
+
+    if add_col == True:
+        df[f'rsi({n})'] = rsi
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(rsi, columns=[f'rsi({n})'], index=df.index)
+    else:
+        return rsi
+
+
