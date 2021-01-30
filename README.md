@@ -1,5 +1,5 @@
 # py_ti
-A collection of technical indicators.
+A collection of 18 technical indicators. Suggestions welcome.
 
 # Current List:<br />
 Simple Returns<br />
