@@ -19,6 +19,7 @@ Average True Range Percent<br />
 Keltner Channels<br />
 Bollinger Bands<br />
 Relative Strength Index<br />
+True Strength Index<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
