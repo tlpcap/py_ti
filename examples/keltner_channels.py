@@ -6,12 +6,12 @@ import py_ti as ti
 data = pd.read_csv('spy_data.csv')
 
 # Return a Numpy array with 2 columns.
-# Column 0 is the lower Keltner Channel
-# Column 1 is the upper Keltner Channel
+# Column 0 is the lower bound of the Keltner Channel 
+# Column 1 is the upper bound of the Keltner Channel
 keltner_numpy_array = ti.keltner_channel(data) # same as ti.keltner_channel(data, n=20, add_col=False, return_struct='numpy')
 
 # Return a new Pandas Dataframe with 2 columns.
-# 1 column for each channel
+# 1 column for each boundary of the channel
 keltner_dataframe = ti.keltner_channel(data, return_struct='pandas')  # same as ti.keltner_channel(data, n=20, add_col=False, return_struct='pandas')
 
 # add 20 period Keltner Channels with SMA smoothing (default) to the Dataframe that was passed in
