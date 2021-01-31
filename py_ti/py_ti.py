@@ -639,3 +639,79 @@ def tsi(df, column='close', n=1, slow=25, fast=13, sig=7,
         return tsi_signal
 
 
+def adx(df, column='close', n=20, ma_method='sma',
+        add_col=False, return_struct='numpy'):
+""" Average Directional Index
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is just a place holder for this function so that dataframes that
+        pass to other functions don't encounter errors. It shouldn't be changed.
+    n : Int, optional. The default is 20
+        The lookback period for the all internal calculations of the ADX.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the internal calculation of the ADX.
+        Available smoothing methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                  add_col=add_col, return_struct=return_struct)
+
+    _atr = atr(df, n=n, ma_method=ma_method)
+
+    up = (df['high'] - df['high'].shift(1)).fillna(0)
+    dn = (df['low'].shift(1) - df['low']).fillna(0)
+    up[up < 0] = 0
+    dn[dn < 0] = 0
+    pos = pd.DataFrame(((up > dn) & (up > 0)) * up, columns=[column])
+    neg = pd.DataFrame(((dn > up) & (dn > 0)) * dn, columns=[column])
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    dm_pos = _ma_func(pos, column=column, n=n)
+    dm_neg = _ma_func(neg, column=column, n=n)
+    di_pos = 100 * (dm_pos / _atr)
+    di_neg = 100 * (dm_neg / _atr)
+    di_diff = abs(di_pos - di_neg)
+    di_sum = di_pos + di_neg
+    dx = pd.DataFrame(100 * (di_diff / di_sum), columns=[column]).fillna(0)
+    _adx = _ma_func(dx, column=column, n=n)
+
+    adx = np.vstack((_adx, di_pos, di_neg)).transpose()
+
+    if add_col == True:
+        df[f'ADX({n})'] = adx[:, 0]
+        df['DI+'] = adx[:, 1]
+        df['DI-'] = adx[:, 2]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(adx,
+                            columns=['adx', 'di+', 'di-'],
+                            index=df.index)
+    else:
+        return adx
+
+
