@@ -1,5 +1,5 @@
 # py_ti
-A collection of 18 technical indicators. Suggestions are welcome.
+A collection of 19 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Simple Returns<br />
@@ -20,6 +20,7 @@ Keltner Channels<br />
 Bollinger Bands<br />
 Relative Strength Index<br />
 True Strength Index<br />
+Average Directional Index<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
