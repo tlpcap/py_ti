@@ -4,6 +4,8 @@ import pandas as pd
 import utils
 from check_errors import check_errors
 from moving_averages import sma, ema, wma, hma, wilders_ma, kama
+from helper_loops import psar_loop
+
 
 def returns(df, column='close', ret_method='simple',
             add_col=False, return_struct='numpy'):            
@@ -713,5 +715,59 @@ def adx(df, column='close', n=20, ma_method='sma',
                             index=df.index)
     else:
         return adx
+
+
+def parabolic_sar(df, af_step=0.02, max_af=0.2,
+                  add_col=False, return_struct='numpy'):
+""" Parabolic Stop-and-Reverse
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    af_step : Float, optional. The default is 0.02
+        The acceleration factor.
+    max_af : Float, optional. The default is 0.2
+        The maximum value the accleration factor can have.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, af_step=af_step, max_af=max_af,
+                  add_col=add_col, return_struct=return_struct)
+
+    _psar = df['close'].copy().to_numpy()
+    high = df['high'].copy().to_numpy()
+    low = df['low'].copy().to_numpy()
+
+    psar = psar_loop(_psar, high, low, af_step, max_af)
+
+    if add_col == True:
+        df['psar'] = psar
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(psar,
+                            columns=['psar'],
+                            index=df.index)
+    else:
+        return psar
 
 
