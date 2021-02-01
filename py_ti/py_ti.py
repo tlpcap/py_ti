@@ -4,7 +4,7 @@ import pandas as pd
 import utils
 from check_errors import check_errors
 from moving_averages import sma, ema, wma, hma, wilders_ma, kama
-from helper_loops import psar_loop
+from helper_loops import psar_loop, supertrend_loop
 
 
 def returns(df, column='close', ret_method='simple',
@@ -769,5 +769,67 @@ def parabolic_sar(df, af_step=0.02, max_af=0.2,
                             index=df.index)
     else:
         return psar
+
+
+def supertrend(df, column='close', n=20, ma_method='sma', factor=2.0,
+                add_col=False, return_struct='numpy'):
+""" Supertrend
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the column that is sent to the loop to use for calculations.
+        While uncommon, using 'open' instead of 'close' could be done.
+    n : Int, optional. The default is 20
+        This is the lookback period for the ATR that is used in the
+        calculation and the beginning value for the loop.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the ATR.
+    factor : Float, optional. The default is 2.0
+        The value added and subtracted to the basic upper and basic
+        lower bands.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                  factor=factor, add_col=add_col, return_struct=return_struct)
+
+    _atr = atr(df, n=n, ma_method=ma_method)
+    hl_avg = (df['high'] + df['low']) / 2
+    close = df[column].to_numpy()
+    basic_ub = (hl_avg + factor * _atr).to_numpy()
+    basic_lb = (hl_avg - factor * _atr).to_numpy()
+    supertrend = supertrend_loop(close, basic_ub, basic_lb, n)
+
+    if add_col == True:
+        df[f'supertrend({n})'] = supertrend
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(supertrend,
+                            columns=[f'supertrend({n})'],
+                            index=df.index)
+    else:
+        return supertrend
 
 
