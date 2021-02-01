@@ -96,3 +96,40 @@ def psar_loop(psar, high, low, af_step, max_af):
     return psar
 
 
+@jit
+def supertrend_loop(close, basic_ub, basic_lb, n):
+    """
+    Supertrend Helper Loop
+    Jit used to improve performance
+    """
+
+    length = len(close)
+    final_ub = np.zeros(length)
+    final_lb = np.zeros(length)
+    supertrend = np.zeros(length)
+
+    for i in range(n, length):
+
+        if basic_ub[i] < final_ub[i-1] or close[i-1] > final_ub[i-1]:
+            final_ub[i] = basic_ub[i]
+        else:
+            final_ub[i] = final_ub[i-1]
+
+        if basic_lb[i] > final_lb[i-1] or close[i-1] < final_lb[i-1]:
+            final_lb[i] = basic_lb[i]
+        else:
+            final_lb[i] = final_lb[i-1]
+
+        if supertrend[i-1] == final_ub[i-1] and close[i] <= final_ub[i]:
+            supertrend[i] = final_ub[i]
+        elif supertrend[i-1] == final_ub[i-1] and close[i] > final_ub[i]:
+            supertrend[i] = final_lb[i]
+        elif supertrend[i-1] == final_lb[i-1] and close[i] >= final_lb[i]:
+            supertrend[i] = final_lb[i]
+        elif supertrend[i-1] == final_lb[i-1] and close[i] < final_lb[i]:
+            supertrend[i] = final_ub[i]
+        else:
+            supertrend[i] = 0.00
+
+    return supertrend
+
