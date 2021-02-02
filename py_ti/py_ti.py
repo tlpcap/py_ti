@@ -833,3 +833,91 @@ def supertrend(df, column='close', n=20, ma_method='sma', factor=2.0,
         return supertrend
 
 
+def acc_dist(df, add_col=False, return_struct='numpy'):
+""" Accumulation/Distribution
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, add_col=add_col, return_struct=return_struct)
+
+    clv = ((2 * df['close'] - df['high'] - df['low']) /
+            (df['high'] - df['low']) * df['volume'])
+    ad = clv.cumsum()
+
+    if add_col == True:
+        df['acc_dist'] = ad
+        return df
+    elif return_struct == 'pandas':
+        return ad.to_frame(name='acc_dist')
+    else:
+        return ad.to_numpy()
+
+
+def obv(df, add_col=False, return_struct='numpy'):
+""" On-Balance Volume
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, add_col=add_col, return_struct=return_struct)
+
+    _mask = df['close'].mask(df['close'] >= df['close'].shift(1), other = 1)
+    mask = _mask.where(_mask == 1, other = -1)
+    obv = (df['volume'] * mask).cumsum()
+
+    if add_col == True:
+        df['obv'] = obv
+        return df
+    elif return_struct == 'pandas':
+        return obv.to_frame(name='obv')
+    else:
+        return obv.to_numpy()
+
+
