@@ -1,5 +1,5 @@
 # py_ti
-A collection of 21 technical indicators. Suggestions are welcome.
+A collection of 23 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Simple Returns<br />
@@ -23,6 +23,8 @@ True Strength Index<br />
 Average Directional Index<br />
 Parabolic Stop-and-Reverse<br />
 Supertrend<br />
+Accumulation/Distribution<br />
+On-Balance Volume<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
