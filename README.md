@@ -1,34 +1,35 @@
 # py_ti
-A collection of 27 technical indicators. Suggestions are welcome.
+A collection of 28 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
-Simple Returns<br />
-Log Returns<br />
-Historical Volatility<br />
-Simple Moving Average<br />
-Exponential Moving Average<br />
-Weighted Moving Average<br />
-Hull Moving Average<br />
-Wilder's Moving Average<br />
-Kaufman's Adaptive Moving Average<br />
-Momentum<br />
-Rate of Change<br />
-True Range<br />
+Accumulation/Distribution<br />
+Average Directional Index<br />
 Average True Range<br />
 Average True Range Percent<br />
-Keltner Channels<br />
 Bollinger Bands<br />
-Relative Strength Index<br />
-True Strength Index<br />
-Average Directional Index<br />
-Parabolic Stop-and-Reverse<br />
-Supertrend<br />
-Accumulation/Distribution<br />
-On-Balance Volume<br />
-Traditional Pivot Points<br />
-Fibonacci Pivot Points<br />
-Woodie Pivot Points<br />
 Demark Pivot Points<br />
+Exponential Moving Average<br />
+Fibonacci Pivot Points<br />
+Historical Volatility<br />
+Hull Moving Average<br />
+Kaufman's Adaptive Moving Average<br />
+Keltner Channels<br />
+Log Returns<br />
+Momentum<br />
+On-Balance Volume<br />
+Parabolic Stop-and-Reverse<br />
+Rate of Change<br />
+Relative Strength Index<br />
+Simple Moving Average<br />
+Simple Returns<br />
+Stochastic Oscillator<br />
+Supertrend<br />
+Traditional Pivot Points<br />
+True Range<br />
+True Strength Index<br />
+Weighted Moving Average<br />
+Wilder's Moving Average<br />
+Woodie Pivot Points<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
