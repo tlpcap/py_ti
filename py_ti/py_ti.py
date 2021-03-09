@@ -1162,3 +1162,74 @@ def demark_pivots(df, add_col=False, return_struct='numpy'):
         return pps
 
 
+# Full Stochastic Oscillator
+def stochastic(df, n_k=14, n_d=3, n_slow=1, ma_method='sma',
+                    add_col=False, return_struct='numpy'):
+    """ Stochastic Oscillator
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n_k : Int, optional. The default is 14
+        The lookback period over which the highest high and lowest low
+        are determined to compute %k.
+    n_d : Int, optional. The default is 3
+        The number of periods that are used to smooth the full_k.
+    n_slow: Int, optional. The default is 1
+        The number of periods that are used to smooth %k. If left at the
+        default (1) the function returns values that match a "Fast Stochastic".
+        If a different value is used, the function return values that match a
+        "Slow Stochastic".
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n_k=n_k, n_d=n_d, n_slow=n_slow, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    low = df['low'].rolling(n_k).min()
+    high = df['high'].rolling(n_k).max()
+    percent_k = ((df['close'] - low) / (high - low) * 100).to_frame(name='%k')
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    full_k = _ma_func(percent_k, column='%k', n=n_slow,
+                      return_struct='pandas')
+    full_d = _ma_func(full_k, column=f'{ma_method}({n_slow})', n=n_d,
+                      return_struct='pandas')
+
+    full_stoch = np.vstack((full_k[f'{ma_method}({n_slow})'],
+                            full_d[f'{ma_method}({n_d})'])).transpose()
+
+    if add_col == True:
+        df[f'%k({n_k},{n_slow})'] = full_k
+        df[f'%d({n_d})'] = full_d
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(full_stoch,
+                            columns=[f'%k({n_k},{n_slow})', f'%d({n_d})'],
+                            index=df.index)
+    else:
+        return full_stoch
+    
+    
+    
