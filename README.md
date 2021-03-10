@@ -1,5 +1,5 @@
 # py_ti
-A collection of 28 technical indicators. Suggestions are welcome.
+A collection of 30 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution<br />
@@ -20,9 +20,11 @@ On-Balance Volume<br />
 Parabolic Stop-and-Reverse<br />
 Rate of Change<br />
 Relative Strength Index<br />
+RSI-Stochastic Oscillator<br />
 Simple Moving Average<br />
 Simple Returns<br />
 Stochastic Oscillator<br />
+Stochastic-RSI Oscillator<br />
 Supertrend<br />
 Traditional Pivot Points<br />
 True Range<br />
