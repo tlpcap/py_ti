@@ -12,6 +12,7 @@ RET_ERR_MESSAGE = f"Invalid method. Valid methods: {RET_METHODS}"
 N_ERR_MESSAGE = "Error: 'n' must be of type int"
 N_ER_ERR_MESSAGE = "Error: 'n_er' must be of type int"
 N_FAST_ERR_MESSAGE = "Error: 'n_fast' must be of type int"
+N_MED_ERR_MESSAGE = "Error: 'n_med' must be of type int"
 N_SLOW_ERR_MESSAGE = "Error: 'n_slow' must be of type int"
 N_K_ERR_MESSAGE = "Error: 'n_k' must be of type int"
 N_D_ERR_MESSAGE = "Error: 'n_d' must be of type int"
@@ -36,7 +37,10 @@ def check_errors(df=None,
                  n=None,
                  n_er=None,
                  n_fast=None,
+                 n_med=None,
                  n_slow=None,
+                 n_k=None,
+                 n_d=None,
                  fast=None,
                  slow=None,
                  sig=None,
@@ -73,6 +77,9 @@ def check_errors(df=None,
     if n_fast is not None and type(n_fast) is not int:
         raise Exception(N_FAST_ERR_MESSAGE)
 
+    if n_med is not None and type(n_med) is not int:
+        raise Exception(N_MED_ERR_MESSAGE)
+        
     if n_slow is not None and type(n_slow) is not int:
         raise Exception(N_SLOW_ERR_MESSAGE)
 
