@@ -1,5 +1,5 @@
 # py_ti
-A collection of 30 technical indicators. Suggestions are welcome.
+A collection of 31 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution<br />
@@ -29,6 +29,7 @@ Supertrend<br />
 Traditional Pivot Points<br />
 True Range<br />
 True Strength Index<br />
+Ultimate Oscillator<br />
 Weighted Moving Average<br />
 Wilder's Moving Average<br />
 Woodie Pivot Points<br />
