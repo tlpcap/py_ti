@@ -1366,4 +1366,67 @@ def rsi_stochastic(df, n=14, ma_method='sma',
         return rsi_stoch
 
 
+# Ultimate Oscillator
+def ultimate_oscillator(df, n_fast=7, n_med=14, n_slow=28,
+                        add_col=False, return_struct='numpy'):
+    """ Ultimate Oscillator
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n_fast : Int, optional. The default is 7
+        The lookback period over which to compute the fast rolling ratio
+    n_med : Int, optional. The default is 14
+        The lookback period over which to compute the intermediate rolling ratio
+    n_slow : Int, optional. The default is 28
+        The lookback period over which to compute the slow rolling ratio
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, n_fast=n_fast, n_med=n_med, n_slow=n_slow,
+                 add_col=add_col, return_struct=return_struct)
+
+    df['prev_clo'] = df['close'].shift(1)
+    bp = df['close'] - (df[['low','prev_clo']].min(axis=1))
+    tr = true_range(df, return_struct='pandas')
+
+    first_ma = (bp.rolling(n_fast).sum() /
+                tr['true_range'].rolling(n_fast).sum())
+    second_ma = (bp.rolling(n_med).sum() /
+                 tr['true_range'].rolling(n_med).sum())
+    third_ma = (bp.rolling(n_slow).sum() /
+                tr['true_range'].rolling(n_slow).sum())
+
+    ult_osc = ((first_ma * 4 + second_ma * 2 + third_ma) / 7 * 100).to_numpy()
+
+    if add_col == True:
+        df[f'ultimate_oscillator({n_fast},{n_med},{n_slow})'] = ult_osc
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(ult_osc,
+                            columns=[f'ultimate_oscillator({n_fast},{n_med},{n_slow})'],
+                            index=df.index)
+    else:
+        return ult_osc
+
 
