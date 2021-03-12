@@ -16,6 +16,7 @@ N_MED_ERR_MESSAGE = "Error: 'n_med' must be of type int"
 N_SLOW_ERR_MESSAGE = "Error: 'n_slow' must be of type int"
 N_K_ERR_MESSAGE = "Error: 'n_k' must be of type int"
 N_D_ERR_MESSAGE = "Error: 'n_d' must be of type int"
+N_MACD_ERR_MESSAGE = "Error: 'n_macd' must be of type int"
 FAST_ERR_MESSAGE = "Error: 'fast' must be of type int"
 SLOW_ERR_MESSAGE = "Error: 'slow' must be of type int"
 SIG_ERR_MESSAGE = "Error: 'sig' must be of type int"
@@ -41,6 +42,7 @@ def check_errors(df=None,
                  n_slow=None,
                  n_k=None,
                  n_d=None,
+                 n_macd=None,
                  fast=None,
                  slow=None,
                  sig=None,
@@ -88,7 +90,10 @@ def check_errors(df=None,
 
     if n_d is not None and type(n_d) is not int:
         raise Exception(N_D_ERR_MESSAGE)
-        
+    
+    if n_macd is not None and type(n_macd) is not int:
+        raise Exception(N_MACD_ERR_MESSAGE)
+
     if fast is not None and type(fast) is not int:
         raise Exception(FAST_ERR_MESSAGE)
 
