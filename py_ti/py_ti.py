@@ -1184,7 +1184,7 @@ def stochastic(df, n_k=14, n_d=3, n_slow=1, ma_method='sma',
         default (1) the function returns values that match a "Fast Stochastic".
         If a different value is used, the function return values that match a
         "Slow Stochastic".
-    ma_method : Str, optional. The default is 'sma'
+    ma_method : String, optional. The default is 'sma'
         The method of smoothing the stochastics.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
@@ -1256,7 +1256,7 @@ def stochastic_rsi(df, n_k=14, n_d=3, n_slow=1, ma_method='sma',
         default (1) the function returns values that match a "Fast Stochastic".
         If a different value is used, the function return values that match a
         "Slow Stochastic".
-    ma_method : Str, optional. The default is 'sma'
+    ma_method : String, optional. The default is 'sma'
         The method of smoothing the RSI and stochastics.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
@@ -1325,7 +1325,7 @@ def rsi_stochastic(df, n=14, ma_method='sma',
     n : Int, optional. The default is 14
         The lookback period over which the highest high and lowest low
         are determined to compute %k.
-    ma_method : Str, optional. The default is 'sma'
+    ma_method : String, optional. The default is 'sma'
         The method of smoothing the RSI and stochastics.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
@@ -1428,5 +1428,141 @@ def ultimate_oscillator(df, n_fast=7, n_med=14, n_slow=28,
                             index=df.index)
     else:
         return ult_osc
+
+
+# Trix
+def trix(df, column='close', n=20, ma_method='ema',
+         add_col=False, return_struct='numpy'):
+    """ TRIX - Triple smoothed exponential moving average
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the column that the moving averages will be calculated on.
+    n : Int, optional. The default is 20
+        The lookback period over which to compute the moving averages
+    ma_method : String, optional. The default is 'ema'
+        Traditionally, TRIX is an exponential moving average smoothed
+        3 times. This variable enables you to select other moving average
+        types such as Simple, Weighted, Hull, or Wilders.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    ma_1 = _ma_func(df, column=column, n=n,
+                    return_struct='pandas')
+    ma_2 = _ma_func(ma_1, column=f'{ma_method}({n})', n=n,
+                    return_struct='pandas')
+    ma_3 = _ma_func(ma_2, column=f'{ma_method}({n})', n=n,
+                    return_struct='pandas')
+
+    ma_3['prev'] = ma_3[f'{ma_method}({n})'].shift(1)
+    trix = ((ma_3[f'{ma_method}({n})'] / ma_3['prev'] - 1)).to_numpy()
+
+    if add_col == True:
+        df[f'trix {ma_method}({n})'] = trix
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(trix,
+                            columns=[f'trix {ma_method}({n})'],
+                            index=df.index)
+    else:
+        return trix
+
+
+# MACD
+def macd(df, column='close', n_fast=12, n_slow=26, n_macd=9, ma_method='ema',
+         add_col=False, return_struct='numpy'):
+
+    """ MACD - Moving average convergence divergence
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the column that the moving averages will be calculated on.
+    n_fast : Int, optional. The default is 12
+        The lookback period over which to compute the first (fast) moving average.
+    n_slow : Int, optional. The default is 26
+        The lookback period over which to compute the second (slow) moving average.
+    n_macd : Int, optional. The default is 9
+        The lookback period over which to compute the moving average of the MACD to
+        generate the signal line.
+    ma_method : String, optional. The default is 'ema'
+        Traditionally, MACD is calculated using exponential moving averages.
+        This variable enables you to select other moving average types
+        such as Simple, Weighted, Hull, or Wilders.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+    
+    check_errors(df=df, column=column, n_fast=n_fast, n_slow=n_slow,
+                 n_macd=n_macd, ma_method=ma_method, add_col=add_col,
+                 return_struct=return_struct)
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    ma_fast = _ma_func(df, column=column, n=n_fast, return_struct='pandas')
+    ma_slow = _ma_func(df, column=column, n=n_slow, return_struct='pandas')
+    macd = (ma_fast[f'{ma_method}({n_fast})'] -
+            ma_slow[f'{ma_method}({n_slow})']).to_frame(name='macd')
+    macd['signal'] = _ma_func(macd, column='macd', n=n_macd)
+
+    macd = macd.to_numpy()
+
+    if add_col == True:
+        df[f'macd({n_fast},{n_slow})'] = macd[:, 0]
+        df[f'signal({n_macd})'] = macd[:, 1]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(macd,
+                            columns=[f'macd({n_fast},{n_slow})', f'signal({n_macd})'],
+                            index=df.index)
+    else:
+        return macd
 
 
