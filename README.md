@@ -1,5 +1,5 @@
 # py_ti
-A collection of 34 technical indicators. Suggestions are welcome.
+A collection of 35 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution<br />
@@ -16,6 +16,7 @@ Kaufman's Adaptive Moving Average<br />
 Keltner Channels<br />
 Log Returns<br />
 MACD<br />
+Mass Index<br />
 Momentum<br />
 On-Balance Volume<br />
 Parabolic Stop-and-Reverse<br />
