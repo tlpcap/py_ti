@@ -502,7 +502,7 @@ def bollinger_bands(df, column='close', n=20, ma_method='sma', ddof=1,
         return bollinger
 
 
-def rsi(df, column='close', n=20, ma_method='sma',
+def rsi(df, column='close', n=14, ma_method='sma',
         add_col=False, return_struct='numpy'):
     """ Relative Strength Index
     
@@ -515,11 +515,14 @@ def rsi(df, column='close', n=20, ma_method='sma',
         a Datetime.
     column : String, optional. The default is 'close'
         This is the name of the column you want to operate on.
-    n : Int, optional. The default is 20
+    n : Int, optional. The default is 14
         The lookback period.
     ma_method : String, optional. The default is 'sma'
         The method of smoothing the average up and average down variables.
         Available smoothing methods: {'sma', 'ema', 'wma', 'hma', 'wilders'}
+        Traditionally, RSI is calculated using Wilder's moving average.
+        This variable enables you to select other moving average types
+        such as Simple, Exponential, Weighted, or Hull.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
@@ -1491,12 +1494,12 @@ def trix(df, column='close', n=9, sig=3, ma_method='ema',
     trix = trix.to_numpy()
 
     if add_col == True:
-        df[f'trix_{ma_method}({n})'] = trix[:, 0]
+        df[f'trix_({n})'] = trix[:, 0]
         df[f'trix_signal({sig})'] = trix[:, 1]
         return df
     elif return_struct == 'pandas':
         return pd.DataFrame(trix,
-                            columns=[f'trix_{ma_method}({n})',
+                            columns=[f'trix_({n})',
                                      f'trix_signal({sig})'],
                             index=df.index)
     else:
@@ -1506,7 +1509,6 @@ def trix(df, column='close', n=9, sig=3, ma_method='ema',
 # MACD
 def macd(df, column='close', n_fast=12, n_slow=26, n_macd=9, ma_method='ema',
          add_col=False, return_struct='numpy'):
-
     """ MACD - Moving average convergence divergence
     
     Parameters
@@ -1572,5 +1574,64 @@ def macd(df, column='close', n_fast=12, n_slow=26, n_macd=9, ma_method='ema',
                             index=df.index)
     else:
         return macd
+
+
+# Triangular RSI
+def triangular_rsi(df, column='close', n=5, ma_method='sma',
+                   add_col=False, return_struct='numpy'):
+    """ Triangular RSI
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        This is the column that the moving averages will be calculated on.
+    n : Int, optional. The default is 5
+        The lookback period over which to compute all 3 rsi's.
+    ma_method : String, optional. The default is 'sma'
+        Traditionally, RSI is calculated using Wilder's moving average.
+        This variable enables you to select other moving average types
+        such as Simple, Exponential, Weighted, or Hull.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    rsi_1 = rsi(df, column=column, n=n, ma_method=ma_method,
+                return_struct='pandas')
+    rsi_2 = rsi(rsi_1, column=f'rsi({n})', n=n, ma_method=ma_method,
+                return_struct='pandas')
+    tri_rsi = rsi(rsi_2, column=f'rsi({n})', n=n, ma_method=ma_method)
+
+    if add_col == True:
+        df[f'triangular_rsi({n})'] = tri_rsi
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(tri_rsi,
+                            columns=[f'triangular_rsi({n})'],
+                            index=df.index)
+    else:
+        return tri_rsi
 
 
