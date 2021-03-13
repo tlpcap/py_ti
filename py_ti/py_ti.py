@@ -1431,7 +1431,7 @@ def ultimate_oscillator(df, n_fast=7, n_med=14, n_slow=28,
 
 
 # Trix
-def trix(df, column='close', n=20, ma_method='ema',
+def trix(df, column='close', n=9, sig=3, ma_method='ema',
          add_col=False, return_struct='numpy'):
     """ TRIX - Triple smoothed exponential moving average
     
@@ -1444,8 +1444,10 @@ def trix(df, column='close', n=20, ma_method='ema',
         a Datetime.
     column : String, optional. The default is 'close'
         This is the column that the moving averages will be calculated on.
-    n : Int, optional. The default is 20
-        The lookback period over which to compute the moving averages
+    n : Int, optional. The default is 9
+        The lookback period over which to compute the moving averages.
+    sig : Int, optional. The default is 3
+        The lookback period over which the signal line is calculated.
     ma_method : String, optional. The default is 'ema'
         Traditionally, TRIX is an exponential moving average smoothed
         3 times. This variable enables you to select other moving average
@@ -1469,7 +1471,7 @@ def trix(df, column='close', n=20, ma_method='ema',
     return_struct parameter.
     """
     
-    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+    check_errors(df=df, column=column, n=n, sig=sig, ma_method=ma_method,
                  add_col=add_col, return_struct=return_struct)
 
     _ma_func = utils.moving_average_mapper(ma_method)
@@ -1482,14 +1484,20 @@ def trix(df, column='close', n=20, ma_method='ema',
                     return_struct='pandas')
 
     ma_3['prev'] = ma_3[f'{ma_method}({n})'].shift(1)
-    trix = ((ma_3[f'{ma_method}({n})'] / ma_3['prev'] - 1)).to_numpy()
+    trix = ((ma_3[f'{ma_method}({n})'] /
+             ma_3['prev'] - 1) * 10000).to_frame(name='close')
+    trix['signal'] = _ma_func(trix, n=sig)
+
+    trix = trix.to_numpy()
 
     if add_col == True:
-        df[f'trix {ma_method}({n})'] = trix
+        df[f'trix_{ma_method}({n})'] = trix[:, 0]
+        df[f'trix_signal({sig})'] = trix[:, 1]
         return df
     elif return_struct == 'pandas':
         return pd.DataFrame(trix,
-                            columns=[f'trix {ma_method}({n})'],
+                            columns=[f'trix_{ma_method}({n})',
+                                     f'trix_signal({sig})'],
                             index=df.index)
     else:
         return trix
