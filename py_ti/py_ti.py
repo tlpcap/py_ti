@@ -1635,3 +1635,65 @@ def triangular_rsi(df, column='close', n=5, ma_method='sma',
         return tri_rsi
 
 
+# Mass Index
+def mass_index(df, n=9, n_sum=25, ma_method='ema',
+               add_col=False, return_struct='numpy'):
+    """ Mass Index
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n : Int, optional. The default is 9
+        The lookback period over which the 2 moving averages are calculated.
+    n_sum : Int, optional. The default is 25
+        The lookback period over which the mass is summed to calculate the index.
+    ma_method : String, optional. The default is 'ema'
+        Traditionally, Mass Index is calculated using an Exponential moving average.
+        This variable enables you to select other moving average types
+        such as Simple, Weighted, Hull, or Wilder's.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n=n, n_sum=n_sum, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    high_low = (df['high'] - df['low']).to_frame(name='close')
+    ma_1 = _ma_func(high_low, n=n, return_struct='pandas')
+    ma_2 = _ma_func(ma_1, column=f'{ma_method}({n})', n=n, return_struct='pandas')
+    mass = ma_1 / ma_2
+
+    mass_idx = (mass.rolling(n_sum).sum()).to_numpy()
+
+    if add_col == True:
+        df[f'mass_index({n},{n_sum})'] = mass_idx
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(mass_idx,
+                            columns=[f'mass_index({n},{n_sum})'],
+                            index=df.index)
+    else:
+        return mass_idx
+
+
