@@ -1,5 +1,5 @@
 # py_ti
-A collection of 35 technical indicators. Suggestions are welcome.
+A collection of 37 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution<br />
@@ -14,6 +14,7 @@ Historical Volatility<br />
 Hull Moving Average<br />
 Kaufman's Adaptive Moving Average<br />
 Keltner Channels<br />
+KST Oscillator - Know Sure Thing<br />
 Log Returns<br />
 MACD<br />
 Mass Index<br />
@@ -34,6 +35,7 @@ True Range<br />
 TRIX<br />
 True Strength Index<br />
 Ultimate Oscillator<br />
+Vortex Indicator<br />
 Weighted Moving Average<br />
 Wilder's Moving Average<br />
 Woodie Pivot Points<br />
