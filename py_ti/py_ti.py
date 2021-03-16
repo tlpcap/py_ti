@@ -1697,3 +1697,154 @@ def mass_index(df, n=9, n_sum=25, ma_method='ema',
         return mass_idx
 
 
+# Vortex Indicator
+def vortex(df, n=5, add_col=False, return_struct='numpy'):
+    """ Vortex Indicator
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n : Int, optional. The default is 5
+        The lookback period over which vm_pos and vm_neg are summed.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n=n, add_col=add_col, return_struct=return_struct)
+
+    vm_pos = abs(df['high'] - df['low'].shift(1))
+    vm_neg = abs(df['low'] - df['high'].shift(1))
+    tr = true_range(df, return_struct='pandas')
+
+    vm_pos_sum = vm_pos.rolling(n).sum()
+    vm_neg_sum = vm_neg.rolling(n).sum()
+    tr_sum = tr['true_range'].rolling(n).sum()
+
+    vtx_pos = vm_pos_sum / tr_sum
+    vtx_neg = vm_neg_sum / tr_sum
+
+    vtx = np.vstack((vtx_pos, vtx_neg)).transpose()
+
+    if add_col == True:
+        df[f'vortex_pos({n})'] = vtx[:, 0]
+        df[f'vortex_neg({n})'] = vtx[:, 1]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(vtx,
+                            columns=[f'vortex_pos({n})', f'vortex_neg({n})'],
+                            index=df.index)
+    else:
+        return vtx
+
+
+# KST Oscillator
+def kst(df, n_1=10, n_2=15, n_3=20, n_4=30, ma_1=10, ma_2=10, ma_3=10, ma_4=15,
+        sig=9, ma_method='sma', add_col=False, return_struct='numpy'):
+    """ KST Oscillator -- Martin Pring's "Know Sure Thing"
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n_1 : Int, optional. The default is 10
+        The lookback period over which the first ROC is calculated.
+    n_2 : Int, optional. The default is 15
+        The lookback period over which the second ROC is calculated.
+    n_3 : Int, optional. The default is 20
+        The lookback period over which the third ROC is calculated.
+    n_4 : Int, optional. The default is 30
+        The lookback period over which the fourth ROC is calculated.
+    ma_1 : Int, optional. The default is 10
+        The lookback period over which the first ROC is smoothed.
+    ma_2 : Int, optional. The default is 10
+        The lookback period over which the second ROC is smoothed.
+    ma_3 : Int, optional. The default is 10
+        The lookback period over which the third ROC is smoothed.
+    ma_4 : Int, optional. The default is 15
+        The lookback period over which the fourth ROC is smoothed.
+    sig : Int, optional. The default is 9
+        The lookback over which the final KST is smoothed to calculated
+        the signal.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing for the entire function. Traditionally, this
+        oscillator uses a Simple Moving Average. This input variable enables
+        the user to use other types of smoothing such as Exponential, Weighted,
+        Hull, or Wilder's.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n_1=n_1, n_2=n_2, n_3=n_3, n_4=n_4,
+                 ma_1=ma_1, ma_2=ma_2, ma_3=ma_3, ma_4=ma_4,
+                 sig=sig, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    roc_1 = rate_of_change(df, n=n_1, return_struct='pandas')
+    roc_2 = rate_of_change(df, n=n_2, return_struct='pandas')
+    roc_3 = rate_of_change(df, n=n_3, return_struct='pandas')
+    roc_4 = rate_of_change(df, n=n_4, return_struct='pandas')
+
+    _ma_func = utils.moving_average_mapper(ma_method)
+
+    roc_ma_1 = _ma_func(roc_1, column=f'roc({n_1})', n=ma_1, return_struct='pandas')
+    roc_ma_2 = _ma_func(roc_2, column=f'roc({n_2})', n=ma_2, return_struct='pandas')
+    roc_ma_3 = _ma_func(roc_3, column=f'roc({n_3})', n=ma_3, return_struct='pandas')
+    roc_ma_4 = _ma_func(roc_4, column=f'roc({n_4})', n=ma_4, return_struct='pandas')
+
+    kst = pd.DataFrame(roc_ma_1[f'{ma_method}({ma_1})'] +
+                       roc_ma_2[f'{ma_method}({ma_2})'] * 2 +
+                       roc_ma_3[f'{ma_method}({ma_3})'] * 3 +
+                       roc_ma_4[f'{ma_method}({ma_4})'] * 4 ,
+                       columns=['close'])
+    kst['signal'] = _ma_func(kst, n=sig)
+
+    kst = kst.to_numpy()
+
+    if add_col == True:
+        df['kst'] = kst[:, 0]
+        df['kst_signal'] = kst[:, 1]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(kst,
+                            columns=['kst', 'kst_signal'],
+                            index=df.index)
+    else:
+        return kst
+
