@@ -33,6 +33,7 @@ type_dict = {
     'fast': int,
     'slow': int,
     'sig': int,
+    'constant': float,
     'factor': float,
     'upper_factor': float,
     'lower_factor': float,
