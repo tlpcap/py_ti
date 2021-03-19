@@ -1868,6 +1868,9 @@ def cci(df, n=14, ma_method='sma', constant=0.015,
         oscillator uses a Simple Moving Average. This input variable enables
         the user to use other types of smoothing such as Exponential, Weighted,
         Hull, or Wilder's.
+    constant : Float, optional. The default is 0.015.
+        This is the constant used by the creator of this indicator.  It can be
+        changed by the user.
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
