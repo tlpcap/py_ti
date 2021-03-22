@@ -1,5 +1,5 @@
 # py_ti
-A collection of 38 technical indicators. Suggestions are welcome.
+A collection of 39 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution<br />
@@ -10,6 +10,7 @@ Bollinger Bands<br />
 Commodity Channel Index<br />
 Demark Pivot Points<br />
 Exponential Moving Average<br />
+Fibonacci Moving Average<br />
 Fibonacci Pivot Points<br />
 Historical Volatility<br />
 Hull Moving Average<br />
