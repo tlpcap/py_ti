@@ -3,7 +3,7 @@ import pandas as pd
 
 import utils
 from check_errors import check_errors
-from moving_averages import sma, ema, wma, hma, wilders_ma, kama
+from moving_averages import sma, ema, wma, hma, wilders_ma, kama, fma
 from helper_loops import psar_loop, supertrend_loop
 
 
