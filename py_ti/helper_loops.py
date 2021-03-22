@@ -133,3 +133,36 @@ def supertrend_loop(close, basic_ub, basic_lb, n):
 
     return supertrend
 
+
+@jit
+def fib():
+    """
+    Fibonacci function to be enclosed
+    Returns a function to be looped over
+    Jit used to improve performance
+    """
+    x0 = 0
+    x1 = 1
+
+    def get_next_num():
+
+        nonlocal x0, x1
+        x0, x1 = x1, x0 + x1
+        return x1
+
+    return get_next_num
+
+
+@jit
+def fib_loop(n):
+    """
+    Fibonacci loop
+    Returns the fibonacci sequence as a list from the 3rd to the n-1th number
+    Jit used to improve performance
+    """
+
+    fib = [0, 1]
+    [fib.append(fib[-2] + fib[-1]) for i in range(n-1)]
+
+    return fib[3:]
+
