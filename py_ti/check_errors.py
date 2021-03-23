@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 RET_METHODS = {'simple', 'log'}
-MA_METHODS = {'sma', 'ema', 'wma', 'hma', 'wilders', 'kama'}
+MA_METHODS = {'sma', 'ema', 'wma', 'hma', 'wilders', 'kama', 'fma'}
 RETURN_STRUCTS = {'numpy', 'pandas'}
 DDOF = {0, 1}
 
