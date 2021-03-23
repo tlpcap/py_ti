@@ -1,10 +1,17 @@
 import numpy as np
 import pandas as pd
 
-import utils
+from moving_averages import moving_average_mapper
 from check_errors import check_errors
-from moving_averages import sma, ema, wma, hma, wilders_ma, kama, fma
-from helper_loops import psar_loop, supertrend_loop
+
+
+sma = moving_average_mapper('sma')
+ema = moving_average_mapper('ema')
+wma = moving_average_mapper('wma')
+hma = moving_average_mapper('hma')
+wilders_ma = moving_average_mapper('wilders')
+kama = moving_average_mapper('kama')
+fma = moving_average_mapper('fma')
 
 
 def returns(df, column='close', ret_method='simple',
@@ -296,7 +303,7 @@ def atr(df, n=20, ma_method='sma', add_col=False, return_struct='numpy'):
     tr = true_range(df, add_col=False, return_struct='pandas')
     tr.columns = ['close']
     
-    _ma = utils.moving_average_mapper(ma_method)
+    _ma = moving_average_mapper(ma_method)
     atr = _ma(tr, n=n)            
 
     if add_col == True:
@@ -409,7 +416,7 @@ def keltner_channel(df, column='close', n=20, ma_method='sma',
                  upper_factor=upper_factor, lower_factor=lower_factor,
                  add_col=add_col, return_struct=return_struct)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
     
     _ma = _ma_func(df, column=column, n=n)
     _atr = atr(df, n=n, ma_method=ma_method)
@@ -482,7 +489,7 @@ def bollinger_bands(df, column='close', n=20, ma_method='sma', ddof=1,
                   upper_num_sd=upper_num_sd, lower_num_sd=lower_num_sd,
                   add_col=add_col, return_struct=return_struct)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     price_std = (df[column].rolling(window=n).std(ddof=ddof)).to_numpy()
     mid_bb = _ma_func(df, column=column, n=n)
@@ -550,7 +557,7 @@ def rsi(df, column='close', n=14, ma_method='sma',
     up[up < 0] = 0
     dn[dn > 0] = 0
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     avg_up = _ma_func(up, column=column, n=n)
     avg_dn = -_ma_func(dn, column=column, n=n)
@@ -616,7 +623,7 @@ def tsi(df, column='close', n=1, slow=25, fast=13, sig=7,
     mom = momentum(df, column=column, n=n, return_struct='pandas')
     abs_mom = abs(mom)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     _slow = _ma_func(mom, column=f'mom({n})',
                      n=slow, return_struct='pandas')
@@ -694,7 +701,7 @@ def adx(df, column='close', n=20, ma_method='sma',
     pos = pd.DataFrame(((up > dn) & (up > 0)) * up, columns=[column])
     neg = pd.DataFrame(((dn > up) & (dn > 0)) * dn, columns=[column])
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     dm_pos = _ma_func(pos, column=column, n=n)
     dm_neg = _ma_func(neg, column=column, n=n)
@@ -753,6 +760,8 @@ def parabolic_sar(df, af_step=0.02, max_af=0.2,
     Note: If add_col=True the function exits and does not execute the
     return_struct parameter.
     """
+
+    from helper_loops import psar_loop
 
     check_errors(df=df, af_step=af_step, max_af=max_af,
                   add_col=add_col, return_struct=return_struct)
@@ -815,6 +824,8 @@ def supertrend(df, column='close', n=20, ma_method='sma', factor=2.0,
     return_struct parameter.
     """
 
+    from helper_loops import supertrend_loop
+            
     check_errors(df=df, column=column, n=n, ma_method=ma_method,
                   factor=factor, add_col=add_col, return_struct=return_struct)
 
@@ -1215,7 +1226,7 @@ def stochastic(df, n_k=14, n_d=3, n_slow=1, ma_method='sma',
     high = df['high'].rolling(n_k).max()
     percent_k = ((df['close'] - low) / (high - low) * 100).to_frame(name='%k')
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     full_k = _ma_func(percent_k, column='%k', n=n_slow,
                       return_struct='pandas')
@@ -1290,7 +1301,7 @@ def stochastic_rsi(df, n_k=14, n_d=3, n_slow=1, ma_method='sma',
     percent_k = ((rsi_df[f'rsi({n_k})'] - low) /
                  (high - low) * 100).to_frame(name='%k')
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     full_k = _ma_func(percent_k, column='%k', n=n_slow,
                       return_struct='pandas')
@@ -1477,7 +1488,7 @@ def trix(df, column='close', n=9, sig=3, ma_method='ema',
     check_errors(df=df, column=column, n=n, sig=sig, ma_method=ma_method,
                  add_col=add_col, return_struct=return_struct)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     ma_1 = _ma_func(df, column=column, n=n,
                     return_struct='pandas')
@@ -1554,7 +1565,7 @@ def macd(df, column='close', n_fast=12, n_slow=26, n_macd=9, ma_method='ema',
                  n_macd=n_macd, ma_method=ma_method, add_col=add_col,
                  return_struct=return_struct)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     ma_fast = _ma_func(df, column=column, n=n_fast, return_struct='pandas')
     ma_slow = _ma_func(df, column=column, n=n_slow, return_struct='pandas')
@@ -1677,7 +1688,7 @@ def mass_index(df, n=9, n_sum=25, ma_method='ema',
     check_errors(df=df, n=n, n_sum=n_sum, ma_method=ma_method,
                  add_col=add_col, return_struct=return_struct)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     high_low = (df['high'] - df['low']).to_frame(name='close')
     ma_1 = _ma_func(high_low, n=n, return_struct='pandas')
@@ -1821,7 +1832,7 @@ def kst(df, n_1=10, n_2=15, n_3=20, n_4=30, ma_1=10, ma_2=10, ma_3=10, ma_4=15,
     roc_3 = rate_of_change(df, n=n_3, return_struct='pandas')
     roc_4 = rate_of_change(df, n=n_4, return_struct='pandas')
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     roc_ma_1 = _ma_func(roc_1, column=f'roc({n_1})', n=ma_1, return_struct='pandas')
     roc_ma_2 = _ma_func(roc_2, column=f'roc({n_2})', n=ma_2, return_struct='pandas')
@@ -1897,7 +1908,7 @@ def cci(df, n=14, ma_method='sma', constant=0.015,
     mad_func = lambda x: np.fabs(x - x.mean()).mean()
     mad = pp.rolling(n).apply(mad_func)
 
-    _ma_func = utils.moving_average_mapper(ma_method)
+    _ma_func = moving_average_mapper(ma_method)
 
     pp_avg = _ma_func(pp, n=n)
 
