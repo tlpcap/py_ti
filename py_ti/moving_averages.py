@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from check_errors import check_errors
-from helper_loops import wilders_loop, kama_loop
+from helper_loops import wilders_loop, kama_loop, fib_loop
 
 
 def sma(df, column='close', n=20, add_col=False, return_struct='numpy'):
@@ -358,4 +358,24 @@ def fma(df, column='close', n=15,
                             index=df.index)
     else:
         return fma
+
+
+def moving_average_mapper(moving_average):
+    """
+    Map input strings to functions
+    Returns the desired moving average function
+    """
+    moving_average_funcs = {
+        'sma': sma,
+        'ema': ema,
+        'wma': wma,
+        'hma': hma,
+        'wilders': wilders_ma,
+        'kama': kama,
+        'fma': fma,
+        }
+
+    moving_average = moving_average_funcs[moving_average]
+
+    return moving_average
 
