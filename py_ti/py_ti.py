@@ -370,9 +370,9 @@ def atr_percent(df, column='close', n=20, ma_method='sma',
         return atr_prcnt.to_numpy()
 
     
-def keltner_channel(df, column='close', n=20, ma_method='sma',
-                    upper_factor=2.0, lower_factor=2.0,
-                    add_col=False, return_struct='numpy'):
+def keltner_channels(df, column='close', n=20, ma_method='sma',
+                     upper_factor=2.0, lower_factor=2.0,
+                     add_col=False, return_struct='numpy'):
     """ Keltner Channels
     
     Parameters
