@@ -1988,3 +1988,128 @@ def chaikin_oscillator(df, n_slow=10, n_fast=3, ma_method='ema',
     else:
         return chaikin
 
+
+# Money Flow Index
+def money_flow_index(df, n=14, add_col=False, return_struct='numpy'):
+    """ Money Flow Index
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n : Int, optional. The default is 14
+        The lookback period over which the up and down raw money flow
+        is summed.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n=n, add_col=add_col, return_struct=return_struct)
+
+    pp = (df['high'] + df['low'] + df['close']) / 3
+    rmf = pp * df['volume']
+
+    _mask = pp.mask(pp >= pp.shift(1), other = 1)
+    mask = _mask.where(_mask == 1, other = -1)
+    volume = mask * rmf
+
+    up, dn = volume.copy(), volume.copy()
+    up[up < 0] = 0
+    dn[dn > 0] = 0
+
+    sum_up = up.rolling(n).sum()
+    sum_dn = abs(dn).rolling(n).sum()
+    mfr = sum_up / sum_dn
+
+    mfi = (100.0 - 100.0 / (1 + mfr)).to_numpy()
+
+    if add_col == True:
+        df[f'mfi({n})'] = mfi
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(mfi,
+                            columns=[f'mfi({n})'],
+                            index=df.index)
+    else:
+        return mfi
+
+
+# Force Index
+def force_index(df, column='close', n=13, ma_method='ema',
+                add_col=False, return_struct='numpy'):
+    """ Force Index
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        The column to use to calculate the change that is multiplied by
+        the volume.
+    n : Int, optional. The default is 13
+        The lookback period over which the force number is smoothed.
+    ma_method : String, optional. The default is 'ema'
+        The method of smoothing the force number. Traditionally, this
+        indicator uses an Exponential Moving Average. This input variable enables
+        the user to use other types of smoothing such as Simple, Weighted,
+        Hull, or Wilder's.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, column=column, n=n, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    force = (df[column].diff(1).fillna(0) * df['volume']).to_frame(name='close')
+
+    _ma_func = moving_average_mapper(ma_method)
+
+    fi = _ma_func(force, n=n)
+
+    if add_col == True:
+        df[f'force_index({n})'] = fi
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(fi,
+                            columns=[f'force_index({n})'],
+                            index=df.index)
+    else:
+        return fi
+
+
