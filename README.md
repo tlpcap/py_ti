@@ -1,47 +1,49 @@
 # py_ti
-A collection of 40 technical indicators. Suggestions are welcome.
+A collection of 42 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
-Accumulation/Distribution<br />
-Average Directional Index<br />
-Average True Range<br />
-Average True Range Percent<br />
-Bollinger Bands<br />
-Chaikin Oscillator<br />
-Commodity Channel Index<br />
-Demark Pivot Points<br />
-Exponential Moving Average<br />
-Fibonacci Moving Average<br />
-Fibonacci Pivot Points<br />
-Historical Volatility<br />
-Hull Moving Average<br />
-Kaufman's Adaptive Moving Average<br />
-Keltner Channels<br />
-KST Oscillator - Know Sure Thing<br />
-Log Returns<br />
-MACD<br />
-Mass Index<br />
-Momentum<br />
-On-Balance Volume<br />
-Parabolic Stop-and-Reverse<br />
-Rate of Change<br />
-Relative Strength Index<br />
-RSI-Stochastic Oscillator<br />
-Simple Moving Average<br />
-Simple Returns<br />
-Stochastic Oscillator<br />
-Stochastic-RSI Oscillator<br />
-Supertrend<br />
-Traditional Pivot Points<br />
-Triangular RSI<br />
-True Range<br />
-TRIX<br />
-True Strength Index<br />
-Ultimate Oscillator<br />
-Vortex Indicator<br />
-Weighted Moving Average<br />
-Wilder's Moving Average<br />
-Woodie Pivot Points<br />
+Accumulation/Distribution - acc_dist<br />
+Average Directional Index - adx<br />
+Average True Range - atr<br />
+Average True Range Percent - atr_percent<br />
+Bollinger Bands - bollinger_bands<br />
+Chaikin Oscillator - chaikin_oscillator<br />
+Commodity Channel Index - cci<br />
+Demark Pivot Points - demark_pivots<br />
+Exponential Moving Average - ema<br />
+Fibonacci Moving Average - fma<br />
+Fibonacci Pivot Points - fibonacci_pivots<br />
+Force Index - force_index<br />
+Historical Volatility - hvol<br />
+Hull Moving Average - hma<br />
+Kaufman's Adaptive Moving Average - kama<br />
+Keltner Channels - keltner_channels<br />
+KST Oscillator - kst<br />
+Log Returns - returns(ret_method='log')<br />
+MACD - macd<br />
+Mass Index - mass_index<br />
+Momentum - momentum<br />
+Money Flow Index - money_flow_index<br />
+On-Balance Volume - obv<br />
+Parabolic Stop-and-Reverse - parabolic_sar<br />
+Rate of Change - rate_of_change<br />
+Relative Strength Index - rsi<br />
+RSI-Stochastic Oscillator - rsi_stochastic<br />
+Simple Moving Average - sma<br />
+Simple Returns - returns(ret_method='simple')<br />
+Stochastic Oscillator - stochastic<br />
+Stochastic-RSI Oscillator - stochastic_rsi<br />
+Supertrend - supertrend<br />
+Traditional Pivot Points - pivot_points<br />
+Triangular RSI - triangular_rsi<br />
+True Range - true_range<br />
+TRIX - trix<br />
+True Strength Index - tsi<br />
+Ultimate Oscillator - ultimate_oscillator<br />
+Vortex Indicator - vortex<br />
+Weighted Moving Average - wma<br />
+Wilder's Moving Average - wilders_ma<br />
+Woodie Pivot Points - woodie_pivots<br />
 
 # Data
 Data should be in open/high/low/close/volume format in a Pandas DataFrame with the date as the index.<br />
