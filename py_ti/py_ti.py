@@ -2113,3 +2113,71 @@ def force_index(df, column='close', n=13, ma_method='ema',
         return fi
 
 
+# Ease of Movement
+def ease_of_movement(df, n=14, ma_method='sma',
+                     add_col=False, return_struct='numpy'):
+    """ Ease of Movement - Note that we scale the volume using a 
+    max absolute scaling technique. The .abs() is left out of the function
+    because volume is always positive. This can be replicated with SKLearn's
+    MaxAbsScaler function as well. This adjustment allows values to be compared
+    from one security to another.
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n : Int, optional. The default is 14
+        The lookback period over which the raw ease of movement is smoothed.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the raw ease of movement. Traditionally, this
+        indicator uses an Simple Moving Average. This input variable enables
+        the user to use other types of smoothing such as Exponential, Weighted,
+        Hull, or Wilder's.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n=n, ma_method=ma_method,
+                 add_col=add_col, return_struct=return_struct)
+
+    distance = (((df['high'] + df['low']) / 2) -
+                ((df['high'].shift(1) + df['low'].shift(1)) / 2))
+
+    scaled_volume = df['volume'] / df['volume'].max()
+
+    box_ratio = scaled_volume / (df['high'] - df['low'])
+    eom_raw = (distance / box_ratio).to_frame(name='close')
+
+    _ma_func = moving_average_mapper(ma_method)
+
+    eom = _ma_func(eom_raw, n=n)
+
+    if add_col == True:
+        df[f'ease_of_movement({n})'] = eom
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(eom,
+                            columns=[f'ease_of_movement({n})'],
+                            index=df.index)
+    else:
+        return eom
+
+
