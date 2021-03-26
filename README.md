@@ -59,4 +59,4 @@ Data Example:
 python 3.8.8<br />
 numpy 1.19.2<br />
 pandas 1.2.3<br />
-numba 0.53<br />
+numba 0.53.0<br />
