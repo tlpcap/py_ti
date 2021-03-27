@@ -2181,3 +2181,70 @@ def ease_of_movement(df, n=14, ma_method='sma',
         return eom
 
 
+# Coppock Curve
+def coppock(df, column='close', n_1=14, n_2=11, ma_1=10, ma_method='wma',
+            add_col=False, return_struct='numpy'):
+    """ Coppock Curve
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    column : String, optional. The default is 'close'
+        The column to use to calculate the ROC's in the function.
+    n_1 : Int, optional. The default is 14
+        The lookback period over which the first ROC is calculated.
+    n_2 : Int, optional. The default is 11
+        The lookback period over which the second ROC is calculated.
+    ma_1 : Int, optional. The default is 10
+        The lookback period over which the summed ROC's are smoothed.
+    ma_method : String, optional. The default is 'sma'
+        The method of smoothing the raw ease of movement. Traditionally, this
+        indicator uses a Weighted Moving Average. This input variable enables
+        the user to use other types of smoothing such as Simple, Exponential, Hull,
+        or Wilder's.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, column=column, n_1=n_1, n_2=n_2, ma_1=ma_1,
+                 ma_method=ma_method, add_col=add_col, return_struct=return_struct)
+
+    roc_1 = rate_of_change(df, column=column, n=n_1, return_struct='pandas')
+    roc_2 = rate_of_change(df, column=column, n=n_2, return_struct='pandas')
+
+    roc_sum = (roc_1[f'roc({n_1})'] + roc_2[f'roc({n_2})']).to_frame(name='close')
+
+    _ma_func = moving_average_mapper(ma_method)
+
+    coppock = _ma_func(roc_sum, n=ma_1)
+
+    if add_col == True:
+        df[f'coppock({n_1},{n_2},{ma_1})'] = coppock
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(coppock,
+                            columns=[f'coppock({n_1},{n_2},{ma_1})'],
+                            index=df.index)
+    else:
+        return coppock
+
+
