@@ -1,5 +1,5 @@
 # py_ti
-A collection of 44 technical indicators. Suggestions are welcome.
+A collection of 45 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution - acc_dist<br />
@@ -11,6 +11,7 @@ Chaikin Oscillator - chaikin_oscillator<br />
 Commodity Channel Index - cci<br />
 Coppock Curve - coppock<br />
 Demark Pivot Points - demark_pivots<br />
+Donchian Channels - donchian_channels<br />
 Ease of Movement - ease_of_movement<br />
 Exponential Moving Average - ema<br />
 Fibonacci Moving Average - fma<br />
