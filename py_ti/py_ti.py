@@ -701,27 +701,27 @@ def adx(df, column='close', n=20, ma_method='sma',
     pos = pd.DataFrame(((up > dn) & (up > 0)) * up, columns=[column])
     neg = pd.DataFrame(((dn > up) & (dn > 0)) * dn, columns=[column])
 
-    _ma_func = moving_average_mapper(ma_method)
-
-    dm_pos = _ma_func(pos, column=column, n=n)
-    dm_neg = _ma_func(neg, column=column, n=n)
+    dm_pos = pos[column].rolling(n).sum()
+    dm_neg = neg[column].rolling(n).sum()
     di_pos = 100 * (dm_pos / _atr)
     di_neg = 100 * (dm_neg / _atr)
     di_diff = abs(di_pos - di_neg)
     di_sum = di_pos + di_neg
     dx = pd.DataFrame(100 * (di_diff / di_sum), columns=[column]).fillna(0)
+
+    _ma_func = moving_average_mapper(ma_method)
     _adx = _ma_func(dx, column=column, n=n)
 
     adx = np.vstack((_adx, di_pos, di_neg)).transpose()
 
     if add_col == True:
-        df[f'ADX({n})'] = adx[:, 0]
+        df[f'adx({n})'] = adx[:, 0]
         df['DI+'] = adx[:, 1]
         df['DI-'] = adx[:, 2]
         return df
     elif return_struct == 'pandas':
         return pd.DataFrame(adx,
-                            columns=['adx', 'di+', 'di-'],
+                            columns=[f'adx({n})', 'di+', 'di-'],
                             index=df.index)
     else:
         return adx
