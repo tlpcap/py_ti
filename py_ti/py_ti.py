@@ -935,7 +935,7 @@ def obv(df, add_col=False, return_struct='numpy'):
         return obv.to_numpy()
 
 
-def pivot_points(df, add_col=False, return_struct='numpy'):
+def trad_pivots(df, add_col=False, return_struct='numpy'):
     """ Traditional Pivot Points
     
     Parameters
@@ -972,7 +972,7 @@ def pivot_points(df, add_col=False, return_struct='numpy'):
     r1 = 2 * pp - _df['low']
     s1 = 2 * pp - _df['high']
     r2 = pp + _df['high'] - _df['low']
-    s2 = pp - _df['high'] + _df['low']
+    s2 = pp - _df['high'] - _df['low']
     r3 = 2 * pp + (_df['high'] - 2 * _df['low'])
     s3 = 2 * pp - (_df['high'] * 2 - _df['low'])
 
@@ -1034,7 +1034,7 @@ def fibonacci_pivots(df, add_col=False, return_struct='numpy'):
     r2 = pp + 0.618 * (_df['high'] - _df['low'])
     s2 = pp - 0.618 * (_df['high'] - _df['low'])
     r3 = pp + (_df['high'] - _df['low'])
-    s3 = pp - (_df['high'] * _df['low'])
+    s3 = pp - (_df['high'] - _df['low'])
 
     pps = np.vstack((s3, s2, s1, pp, r1, r2, r3)).transpose()
 
@@ -1096,7 +1096,7 @@ def woodie_pivots(df, add_col=False, return_struct='numpy'):
     r2 = pp + (_df['prev_high'] - _df['prev_low'])
     s2 = pp - (_df['prev_high'] - _df['prev_low'])
     r3 = _df['prev_high'] + 2 * (pp - _df['prev_low'])
-    s3 = _df['prev_low'] -2 * (_df['prev_high'] - pp)
+    s3 = _df['prev_low'] - 2 * (_df['prev_high'] - pp)
 
     pps = np.vstack((s3, s2, s1, pp, r1, r2, r3)).transpose()
 
