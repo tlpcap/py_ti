@@ -1,5 +1,5 @@
 # py_ti
-A collection of 45 technical indicators. Suggestions are welcome.
+A collection of 47 technical indicators. Suggestions are welcome.
 
 # Current List:<br />
 Accumulation/Distribution - acc_dist<br />
@@ -7,7 +7,9 @@ Average Directional Index - adx<br />
 Average True Range - atr<br />
 Average True Range Percent - atr_percent<br />
 Bollinger Bands - bollinger_bands<br />
+Camarilla Pivot Points - camarilla_pivots<br />
 Chaikin Oscillator - chaikin_oscillator<br />
+Classic Pivot Points - classic_pivots<br />
 Commodity Channel Index - cci<br />
 Coppock Curve - coppock<br />
 Demark Pivot Points - demark_pivots<br />
