@@ -995,6 +995,66 @@ def trad_pivots(df, add_col=False, return_struct='numpy'):
         return pps
 
 
+def classic_pivots(df, add_col=False, return_struct='numpy'):
+    """ Classic Pivot Points
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, add_col=add_col, return_struct=return_struct)
+
+    _df = df.shift(1, axis=0)  # Use yesterday's HLC
+
+    pp = (_df['high'] + _df['low'] + _df['close']) / 3
+    r1 = 2 * pp - _df['low']
+    s1 = 2 * pp - _df['high']
+    r2 = pp + _df['high'] - _df['low']
+    s2 = pp - _df['high'] - _df['low']
+    r3 = pp + 2 * (_df['high'] - _df['low'])
+    s3 = pp - 2 * (_df['high'] - _df['low'])
+
+    pps = np.vstack((s3, s2, s1, pp, r1, r2, r3)).transpose()
+
+    if add_col == True:
+        df['s3'] = pps[:, 0]
+        df['s2'] = pps[:, 1]
+        df['s1'] = pps[:, 2]
+        df['pp'] = pps[:, 3]
+        df['r1'] = pps[:, 4]
+        df['r2'] = pps[:, 5]
+        df['r3'] = pps[:, 6]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(pps,
+                            columns=['s3', 's2', 's1', 'pp', 'r1', 'r2', 'r3'],
+                            index=df.index)
+    else:
+        return pps
+
+
 def fibonacci_pivots(df, add_col=False, return_struct='numpy'):
     """ Fibonacci Pivot Points
     
@@ -1171,6 +1231,67 @@ def demark_pivots(df, add_col=False, return_struct='numpy'):
     elif return_struct == 'pandas':
         return pd.DataFrame(pps,
                             columns=['s1', 'pp', 'r1'],
+                            index=df.index)
+    else:
+        return pps
+
+
+# Camarilla Pivots
+def camarilla_pivots(df, add_col=False, return_struct='numpy'):
+    """ Camarilla Pivot Points
+    
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+    
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+            
+    check_errors(df=df, add_col=add_col, return_struct=return_struct)
+
+    _df = df.shift(1, axis=0)  # Use yesterday's HLC
+
+    pp = (_df['high'] + _df['low'] + _df['close']) / 3
+    r1 = _df['close'] + 1.1 * (_df['high'] - _df['low']) / 12
+    s1 = _df['close'] - 1.1 * (_df['high'] - _df['low']) / 12
+    r2 = _df['close'] + 1.1 * (_df['high'] - _df['low']) / 6
+    s2 = _df['close'] - 1.1 * (_df['high'] - _df['low']) / 6
+    r3 = _df['close'] + 1.1 * (_df['high'] - _df['low']) / 4
+    s3 = _df['close'] - 1.1 * (_df['high'] - _df['low']) / 4
+
+    pps = np.vstack((s3, s2, s1, pp, r1, r2, r3)).transpose()
+
+    if add_col == True:
+        df['s3'] = pps[:, 0]
+        df['s2'] = pps[:, 1]
+        df['s1'] = pps[:, 2]
+        df['pp'] = pps[:, 3]
+        df['r1'] = pps[:, 4]
+        df['r2'] = pps[:, 5]
+        df['r3'] = pps[:, 6]
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(pps,
+                            columns=['s3', 's2', 's1', 'pp', 'r1', 'r2', 'r3'],
                             index=df.index)
     else:
         return pps
