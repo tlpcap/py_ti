@@ -37,7 +37,7 @@ Simple Returns - returns(ret_method='simple')<br />
 Stochastic Oscillator - stochastic<br />
 Stochastic-RSI Oscillator - stochastic_rsi<br />
 Supertrend - supertrend<br />
-Traditional Pivot Points - pivot_points<br />
+Traditional Pivot Points - trad_pivots<br />
 Triangular RSI - triangular_rsi<br />
 True Range - true_range<br />
 TRIX - trix<br />
