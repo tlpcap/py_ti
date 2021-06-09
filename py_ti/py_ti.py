@@ -2424,3 +2424,54 @@ def donchian_channels(df, n=20, add_col=False, return_struct='numpy'):
         return donchian
 
 
+# Choppiness Index
+def choppiness(df, n=14, add_col=False, return_struct='numpy'):
+    """ Choppiness Index
+
+    Parameters
+    ----------
+    df : Pandas DataFrame
+        A Dataframe containing the columns open/high/low/close/volume
+        with the index being a date. open/high/low/close should all
+        be floats. volume should be an int. The date index should be
+        a Datetime.
+    n : Int, optional. The default is 14
+        The lookback period over which the true range is summed.
+    add_col : Boolean, optional. The default is False
+        By default the function will return a numpy array. If set to True,
+        the function will add a column to the dataframe that was passed
+        in to it instead or returning a numpy array.
+    return_struct : String, optional. The default is 'numpy'
+        Only two values accepted: 'numpy' and 'pandas'. If set to
+        'pandas', a new dataframe will be returned.
+
+    Returns
+    -------
+    There are 3 ways to return values from this function:
+    1. add_col=False, return_struct='numpy' returns a numpy array (default)
+    2. add_col=False, return_struct='pandas' returns a new dataframe
+    3. add_col=True, adds a column to the dataframe that was passed in
+
+    Note: If add_col=True the function exits and does not execute the
+    return_struct parameter.
+    """
+
+    check_errors(df=df, n=n, add_col=add_col, return_struct=return_struct)
+
+    _atr = atr(df, n=1, ma_method='sma', return_struct='pandas')
+    hh = df['high'].rolling(n).max()
+    ll = df['low'].rolling(n).min()
+    choppiness = (100 *
+                  np.log10(_atr['atr_sma(1)'].rolling(n).sum() / (hh - ll)) /
+                  np.log10(n)).to_numpy()
+
+    if add_col == True:
+        df[f'choppiness({n})'] = choppiness
+        return df
+    elif return_struct == 'pandas':
+        return pd.DataFrame(choppiness,
+                            columns=[f'choppiness({n})'],
+                            index=df.index)
+    else:
+        return choppiness
+
