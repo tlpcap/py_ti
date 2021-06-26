@@ -61,7 +61,7 @@ Data Example:
 ![data_example](https://user-images.githubusercontent.com/29778401/105869496-4b36a300-5fc5-11eb-8324-aaa0fc98f37d.png)
 
 # Versions used:
-python 3.8.8<br />
+python 3.8.10<br />
 numpy 1.19.2<br />
 pandas 1.2.3<br />
 numba 0.53.0<br />
