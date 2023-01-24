@@ -2235,10 +2235,11 @@ def force_index(df, column='close', n=13, ma_method='ema',
 
 
 # Ease of Movement
-def ease_of_movement(df, n=14, ma_method='sma',
+def ease_of_movement(df, n=14, ma_method='sma', scaled=False,
                      add_col=False, return_struct='numpy'):
-    """ Ease of Movement - Note that we scale the volume using a 
-    max absolute scaling technique. The .abs() is left out of the function
+    """ Ease of Movement - Note that we can scale the volume using a 
+    max absolute scaling technique. The traditional EOM indicator does not scale
+    volume, so the default is false. The .abs() is left out of the function
     because volume is always positive. This can be replicated with SKLearn's
     MaxAbsScaler function as well. This adjustment allows values to be compared
     from one security to another.
@@ -2257,6 +2258,7 @@ def ease_of_movement(df, n=14, ma_method='sma',
         indicator uses an Simple Moving Average. This input variable enables
         the user to use other types of smoothing such as Exponential, Weighted,
         Hull, or Wilder's.
+    scaled : Boolean, optional. The default is False
     add_col : Boolean, optional. The default is False
         By default the function will return a numpy array. If set to True,
         the function will add a column to the dataframe that was passed
@@ -2276,15 +2278,18 @@ def ease_of_movement(df, n=14, ma_method='sma',
     return_struct parameter.
     """
 
-    check_errors(df=df, n=n, ma_method=ma_method,
+    check_errors(df=df, n=n, ma_method=ma_method, scaled=scaled,
                  add_col=add_col, return_struct=return_struct)
 
     distance = (((df['high'] + df['low']) / 2) -
                 ((df['high'].shift(1) + df['low'].shift(1)) / 2))
 
-    scaled_volume = df['volume'] / df['volume'].max()
+    if scaled:
+        scaled_volume = df['volume'] / df['volume'].max()
+        box_ratio = scaled_volume / (df['high'] - df['low'])
+    else:
+        box_ratio = df['volume'] / (df['high'] - df['low'])
 
-    box_ratio = scaled_volume / (df['high'] - df['low'])
     eom_raw = (distance / box_ratio).to_frame(name='close')
 
     _ma_func = moving_average_mapper(ma_method)
