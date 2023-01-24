@@ -1,7 +1,7 @@
 from pandas import DataFrame
 
 RET_METHODS = {'simple', 'log'}
-MA_METHODS = {'sma', 'ema', 'wma', 'hma', 'wilders', 'kama', 'fma'}
+MA_METHODS = {'sma', 'ema', 'wma', 'hma', 'wilders', 'kama', 'fma', 'lsma', 'vwma'}
 RETURN_STRUCTS = {'numpy', 'pandas'}
 DDOF = {0, 1}
 
@@ -12,36 +12,44 @@ MA_ERR_MESSAGE = f"Invalid method. Valid methods: {MA_METHODS}"
 RETURN_STRUCTS_ERR_MESSAGE = f"Invalid return_struct. Valid return_structs: {RETURN_STRUCTS}"
 
 type_dict = {
+    'add_col': bool,
+    'af_step': float,
     'column': str,
+    'constant': float,
+    'factor': float,
+    'fast': int,
+    'length': int,
+    'lower_columns': list,
+    'lower_factor': float,
+    'lower_num_sd': float,
+    'max_af': float,
+    'ma_1': int,
+    'ma_2': int,
+    'ma_3': int,
+    'ma_4': int,
     'n': int,
+    'n_d': int,
     'n_er': int,
     'n_fast': int,
-    'n_med': int,
-    'n_slow': int,
+    'n_fib': int,
     'n_k': int,
-    'n_d': int,
     'n_macd': int,
+    'n_med': int,
+    'n_norm': int,
+    'n_slow': int,
     'n_sum': int,
     'n_1': int,
     'n_2': int,
     'n_3': int,
     'n_4': int,
-    'ma_1': int,
-    'ma_2': int,
-    'ma_3': int,
-    'ma_4': int,
-    'fast': int,
-    'slow': int,
+    'scaled': bool,
     'sig': int,
-    'constant': float,
-    'factor': float,
+    'signal_columns': list,
+    'slow': int,
+    'symbol': str,
+    'upper_columns': list,
     'upper_factor': float,
-    'lower_factor': float,
     'upper_num_sd': float,
-    'lower_num_sd': float,
-    'af_step': float,
-    'max_af': float,
-    'add_col': bool,
     }
 
 def int_err_message(var):
@@ -55,6 +63,9 @@ def string_err_message(var):
 
 def bool_err_message(var):
     return f"Error: {var} must be of type bool"
+
+def list_err_message(var):
+    return f"Error: {var} must be of type list"
   
 def check_errors(df=None, column=None, ret_method=None, ma_method=None,
                  ddof=None, return_struct=None, **kwargs):
@@ -75,7 +86,8 @@ def check_errors(df=None, column=None, ret_method=None, ma_method=None,
         raise Exception(MA_ERR_MESSAGE)
 
     if ddof is not None and ddof not in DDOF:
-        raise TypeError(int_err_message('ddof') + 'and either 0 or 1')
+        raise TypeError(''.join([int_err_message('ddof'),
+                                 ' the value must be set to either 0 or 1']))
 
     if return_struct is not None and return_struct not in RETURN_STRUCTS:
         raise Exception(RETURN_STRUCTS_ERR_MESSAGE)
@@ -90,4 +102,6 @@ def check_errors(df=None, column=None, ret_method=None, ma_method=None,
                 raise TypeError(string_err_message(k))
             elif type_dict[k] == bool:
                 raise TypeError(bool_err_message(k))
+            elif type_dict[k] == list:
+                raise TypeError(list_err_message(k))
                 
